@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import { DownloadIcon, SearchIcon } from "lucide-react";
 
 type TrainingJob = {
   id: string;
@@ -41,6 +42,7 @@ export function YoloDashboard() {
       createdAt: "2023-06-15 14:45",
     },
   ]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -89,6 +91,37 @@ export function YoloDashboard() {
     }, 2000);
   };
 
+  const filteredJobs = trainingJobs.filter((job) =>
+    job.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleExport = () => {
+    const csvContent = [
+      ["ID", "Name", "Status", "Progress", "Created At"],
+      ...filteredJobs.map((job) => [
+        job.id,
+        job.name,
+        job.status,
+        job.progress,
+        job.createdAt,
+      ]),
+    ]
+      .map((e) => e.join(","))
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", "yolo_training_jobs.csv");
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid w-full max-w-sm items-center gap-1.5">
@@ -108,6 +141,22 @@ export function YoloDashboard() {
         Upload and Start Training
       </Button>
 
+      <div className="flex justify-between items-center">
+        <div className="relative">
+          <SearchIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search training jobs..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-8 w-[300px]"
+          />
+        </div>
+        <Button onClick={handleExport}>
+          <DownloadIcon className="mr-2 h-4 w-4" />
+          Export CSV
+        </Button>
+      </div>
+
       <Table>
         <TableHeader>
           <TableRow>
@@ -118,7 +167,7 @@ export function YoloDashboard() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {trainingJobs.map((job) => (
+          {filteredJobs.map((job) => (
             <TableRow key={job.id}>
               <TableCell>{job.name}</TableCell>
               <TableCell>{job.status}</TableCell>
