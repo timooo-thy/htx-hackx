@@ -17,7 +17,7 @@ export function RecentActivity() {
         <CardDescription>You have 3 new alerts</CardDescription>
       </CardHeader>
       <Separator />
-      <CardContent className="h-72 overflow-y-scroll pt-4">
+      <CardContent className="h-96 overflow-y-scroll pt-4">
         <div className="space-y-8">
           {recentActivities.map((activity) => (
             <div key={activity.id} className="flex items-center">

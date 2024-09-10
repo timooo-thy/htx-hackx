@@ -5,7 +5,13 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "./ui/chart";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
 import { ChartDataType, TabsType } from "@/lib/types";
 
 type OverviewProps = {
@@ -30,7 +36,7 @@ export function Overview({
   } satisfies ChartConfig;
 
   return (
-    <Card>
+    <Card className="h-full flex flex-col justify-between">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
@@ -57,6 +63,11 @@ export function Overview({
           </BarChart>
         </ChartContainer>
       </CardContent>
+      <CardFooter>
+        <p className="text-sm text-gray-400">
+          Last updated: {chartData[chartData.length - 1].month}
+        </p>
+      </CardFooter>
     </Card>
   );
 }
