@@ -1,56 +1,62 @@
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "./ui/chart";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { ChartDataType, TabsType } from "@/lib/types";
 
-const data = [
-  {
-    name: "Mon",
-    total: 40,
-  },
-  {
-    name: "Tue",
-    total: 30,
-  },
-  {
-    name: "Wed",
-    total: 45,
-  },
-  {
-    name: "Thu",
-    total: 50,
-  },
-  {
-    name: "Fri",
-    total: 60,
-  },
-  {
-    name: "Sat",
-    total: 75,
-  },
-  {
-    name: "Sun",
-    total: 65,
-  },
-];
+type OverviewProps = {
+  title: string;
+  keyName: TabsType;
+  label: string;
+  chartData: ChartDataType[];
+  color: string;
+};
+export function Overview({
+  title,
+  keyName,
+  label,
+  chartData,
+  color,
+}: OverviewProps) {
+  const chartConfig = {
+    [keyName]: {
+      label: label,
+      color: `hsl(var(--chart-${color}))`,
+    },
+  } satisfies ChartConfig;
 
-export function Overview() {
   return (
-    <ResponsiveContainer width="100%" height={350}>
-      <BarChart data={data}>
-        <XAxis
-          dataKey="name"
-          stroke="#888888"
-          fontSize={12}
-          tickLine={false}
-          axisLine={false}
-        />
-        <YAxis
-          stroke="#888888"
-          fontSize={12}
-          tickLine={false}
-          axisLine={false}
-          tickFormatter={(value) => `${value}`}
-        />
-        <Bar dataKey="total" fill="#adfa1d" radius={[4, 4, 0, 0]} />
-      </BarChart>
-    </ResponsiveContainer>
+    <Card>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="pl-2">
+        <ChartContainer config={chartConfig}>
+          <BarChart accessibilityLayer data={chartData}>
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              tickFormatter={(value) => value.slice(0, 3)}
+            />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
+            />
+            <Bar
+              dataKey={keyName}
+              fill={`var(--color-${keyName}) `}
+              radius={8}
+            />
+          </BarChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
   );
 }
