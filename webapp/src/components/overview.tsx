@@ -12,21 +12,13 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { ChartDataType, TabsType } from "@/lib/types";
+import { Doc } from "../../convex/_generated/dataModel";
 
 type OverviewProps = {
-  title: string;
-  keyName: TabsType;
-  label: string;
-  chartData: ChartDataType[];
-  color: string;
+  data: Doc<"tabsOverviewData">;
 };
 export function Overview({
-  title,
-  keyName,
-  label,
-  chartData,
-  color,
+  data: { keyName, label, title, chartData, color },
 }: OverviewProps) {
   const chartConfig = {
     [keyName]: {

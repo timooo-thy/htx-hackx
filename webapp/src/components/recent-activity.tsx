@@ -11,7 +11,7 @@ import { recentActivities } from "@/lib/data";
 
 export function RecentActivity() {
   return (
-    <Card className="col-span-3 h-full">
+    <Card className="col-span-3 h-full w-full">
       <CardHeader>
         <CardTitle>Recent Activity</CardTitle>
         <CardDescription>You have 3 new alerts</CardDescription>

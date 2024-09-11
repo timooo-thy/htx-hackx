@@ -22,63 +22,35 @@ import {
 import { Input } from "@/components/ui/input";
 import { DownloadIcon, SearchIcon } from "lucide-react";
 import Image from "next/image";
-
-type SuspiciousObject = {
-  id: string;
-  reportedAt: string;
-  location: string;
-  description: string;
-  imageUrl: string;
-  status: "pending" | "evaluated" | "cleared";
-  aiEvaluation?: string;
-};
-
-const mockData: SuspiciousObject[] = [
-  {
-    id: "1",
-    reportedAt: "2023-06-15 10:30",
-    location: "123 Main St",
-    description: "Unattended backpack",
-    imageUrl: "/placeholder.svg?height=100&width=100",
-    status: "pending",
-  },
-  {
-    id: "2",
-    reportedAt: "2023-06-15 11:45",
-    location: "Central Park",
-    description: "Suspicious package near bench",
-    imageUrl: "/placeholder.svg?height=100&width=100",
-    status: "evaluated",
-    aiEvaluation: "Low risk. Appears to be a discarded lunchbox.",
-  },
-  // Add more mock data as needed
-];
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
 export function SuspiciousObjectsTable() {
-  const [objects, setObjects] = useState<SuspiciousObject[]>(mockData);
+  const objects = useQuery(api.activity.getSuspiciousActivities, {});
   const [searchTerm, setSearchTerm] = useState("");
 
-  const handleEvaluate = async (id: string) => {
-    // Simulate AI evaluation
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setObjects((prevObjects) =>
-      prevObjects.map((obj) =>
-        obj.id === id
-          ? {
-              ...obj,
-              status: "evaluated",
-              aiEvaluation: "Low risk. Further investigation recommended.",
-            }
-          : obj
-      )
-    );
-  };
+  // const handleEvaluate = async (id: string) => {
+  //   // Simulate AI evaluation
+  //   await new Promise((resolve) => setTimeout(resolve, 1000));
+  //   setObjects((prevObjects) =>
+  //     prevObjects.map((obj) =>
+  //       obj.id === id
+  //         ? {
+  //             ...obj,
+  //             status: "evaluated",
+  //             aiEvaluation: "Low risk. Further investigation recommended.",
+  //           }
+  //         : obj
+  //     )
+  //   );
+  // };
 
-  const filteredObjects = objects.filter(
-    (obj) =>
-      obj.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      obj.location.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredObjects =
+    objects?.filter(
+      (obj) =>
+        obj.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        obj.location.toLowerCase().includes(searchTerm.toLowerCase())
+    ) ?? [];
 
   const handleExport = () => {
     const csvContent = [
@@ -91,8 +63,8 @@ export function SuspiciousObjectsTable() {
         "AI Evaluation",
       ],
       ...filteredObjects.map((obj) => [
-        obj.id,
-        obj.reportedAt,
+        obj._id,
+        obj._creationTime,
         obj.location,
         obj.description,
         obj.status,
@@ -145,8 +117,10 @@ export function SuspiciousObjectsTable() {
         </TableHeader>
         <TableBody>
           {filteredObjects.map((object) => (
-            <TableRow key={object.id}>
-              <TableCell>{object.reportedAt}</TableCell>
+            <TableRow key={object._id}>
+              <TableCell>
+                {new Date(object._creationTime).toLocaleString()}
+              </TableCell>
               <TableCell>{object.location}</TableCell>
               <TableCell>{object.description}</TableCell>
               <TableCell>
@@ -158,13 +132,16 @@ export function SuspiciousObjectsTable() {
                     <DialogHeader>
                       <DialogTitle>Suspicious Object Image</DialogTitle>
                       <DialogDescription>
-                        Reported at {object.reportedAt} - {object.location}
+                        Reported at{" "}
+                        {new Date(object._creationTime).toLocaleString()} -{" "}
+                        {object.location}
                       </DialogDescription>
                     </DialogHeader>
                     <Image
-                      src={object.imageUrl}
+                      src={object.imageUrl ?? ""}
                       alt="Suspicious object"
-                      className="w-full h-auto"
+                      width="100"
+                      height="100"
                     />
                   </DialogContent>
                 </Dialog>
@@ -180,9 +157,7 @@ export function SuspiciousObjectsTable() {
               </TableCell>
               <TableCell>
                 {object.status === "pending" ? (
-                  <Button onClick={() => handleEvaluate(object.id)}>
-                    Evaluate
-                  </Button>
+                  <Button>Evaluate</Button>
                 ) : (
                   <Dialog>
                     <DialogTrigger asChild>
@@ -192,7 +167,8 @@ export function SuspiciousObjectsTable() {
                       <DialogHeader>
                         <DialogTitle>AI Evaluation</DialogTitle>
                         <DialogDescription>
-                          Evaluation for object reported at {object.reportedAt}
+                          Evaluation for object reported at{" "}
+                          {new Date(object._creationTime).toLocaleString()}
                         </DialogDescription>
                       </DialogHeader>
                       <p>{object.aiEvaluation}</p>

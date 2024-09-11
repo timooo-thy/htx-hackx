@@ -15,16 +15,28 @@ import { PatrolMap } from "./patrol-map";
 import { YoloDashboard } from "./yolo-dashboard";
 import { SuspiciousObjectsTable } from "./suspicious-objects-table";
 import StatsCard from "./stats-card";
-import { statsCardData, tabsOverviewData } from "@/lib/data";
-import { TabsType } from "@/lib/types";
+import { statsCardData } from "@/lib/data";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import { Doc } from "../../convex/_generated/dataModel";
 
 type MainDashboardProps = {
   userName: string;
 };
 
 export function MainDashboard({ userName }: MainDashboardProps) {
-  const [activeTab, setActiveTab] = useState<TabsType>("calls");
-  const handleTabChange = (tab: TabsType) => setActiveTab(tab);
+  const [activeTab, setActiveTab] =
+    useState<Doc<"tabsOverviewData">["keyName"]>("calls");
+  const tabsOverviewData = useQuery(
+    api.tabsOverviewData.getTabsOverviewData,
+    {}
+  );
+  const activeTabOverviewData = tabsOverviewData?.find(
+    (data) => data.keyName === activeTab
+  );
+
+  const handleTabChange = (tab: Doc<"tabsOverviewData">["keyName"]) =>
+    setActiveTab(tab);
 
   return (
     <div className="flex-1 space-y-4 pt-6">
@@ -48,11 +60,13 @@ export function MainDashboard({ userName }: MainDashboardProps) {
               <StatsCard {...card} key={i} onClick={handleTabChange} />
             ))}
           </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 ">
-            <div className="col-span-4">
-              <Overview {...tabsOverviewData[activeTab]} />
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            <div className="lg:col-span-4">
+              {activeTabOverviewData && (
+                <Overview data={activeTabOverviewData} />
+              )}
             </div>
-            <div className="col-span-3">
+            <div className="lg:col-span-3">
               <RecentActivity />
             </div>
           </div>

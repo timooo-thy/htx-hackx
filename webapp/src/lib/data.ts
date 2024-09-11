@@ -27,65 +27,6 @@ export const statsCardData = [
   },
 ];
 
-export const tabsOverviewData = {
-  incidents: {
-    keyName: "incidents" as TabsType,
-    label: "Incidents",
-    title: "Overview of Incidents",
-    chartData: [
-      { month: "Jan", incidents: 200 },
-      { month: "Feb", incidents: 250 },
-      { month: "Mar", incidents: 300 },
-      { month: "Apr", incidents: 350 },
-      { month: "May", incidents: 400 },
-      { month: "Jun", incidents: 534 },
-    ],
-    color: "1",
-  },
-  cases: {
-    keyName: "cases" as TabsType,
-    label: "Open Cases",
-    title: "Overview of Open Cases",
-    chartData: [
-      { month: "Jan", cases: 100 },
-      { month: "Feb", cases: 70 },
-      { month: "Mar", cases: 50 },
-      { month: "Apr", cases: 80 },
-      { month: "May", cases: 70 },
-      { month: "Jun", cases: 53 },
-    ],
-    color: "2",
-  },
-  officers: {
-    keyName: "officers" as TabsType,
-    label: "Officers",
-    title: "Overview of Officers",
-    chartData: [
-      { month: "Jan", officers: 12 },
-      { month: "Feb", officers: 13 },
-      { month: "Mar", officers: 12 },
-      { month: "Apr", officers: 15 },
-      { month: "May", officers: 15 },
-      { month: "Jun", officers: 11 },
-    ],
-    color: "3",
-  },
-  calls: {
-    keyName: "calls" as TabsType,
-    label: "Calls",
-    title: "Overview of Calls",
-    chartData: [
-      { month: "Jan", calls: 100 },
-      { month: "Feb", calls: 120 },
-      { month: "Mar", calls: 150 },
-      { month: "Apr", calls: 180 },
-      { month: "May", calls: 160 },
-      { month: "Jun", calls: 69 },
-    ],
-    color: "4",
-  },
-};
-
 export const recentActivities = [
   {
     id: 1,
