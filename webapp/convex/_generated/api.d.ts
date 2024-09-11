@@ -15,6 +15,7 @@ import type {
 } from "convex/server";
 import type * as activity from "../activity.js";
 import type * as tabsOverviewData from "../tabsOverviewData.js";
+import type * as trainingJob from "../trainingJob.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -27,6 +28,7 @@ import type * as tabsOverviewData from "../tabsOverviewData.js";
 declare const fullApi: ApiFromModules<{
   activity: typeof activity;
   tabsOverviewData: typeof tabsOverviewData;
+  trainingJob: typeof trainingJob;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

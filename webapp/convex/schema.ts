@@ -35,4 +35,10 @@ export default defineSchema({
   officers: defineTable({
     name: v.string(),
   }),
+  trainingJobs: defineTable({
+    jobName: v.string(),
+    status: v.union(v.literal("training"), v.literal("completed")),
+    progress: v.number(),
+    videoIds: v.array(v.string()),
+  }),
 });

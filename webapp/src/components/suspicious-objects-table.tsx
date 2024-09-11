@@ -15,6 +15,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -171,7 +172,15 @@ export function SuspiciousObjectsTable() {
                           {new Date(object._creationTime).toLocaleString()}
                         </DialogDescription>
                       </DialogHeader>
-                      <p>{object.aiEvaluation}</p>
+                      <p>AI Evaluation Score: {object.aiEvaluationScore}</p>
+                      <p>Description: {object.aiEvaluation}</p>
+                      <DialogFooter>
+                        <p className="italic font-light text-xs">
+                          Note that AI evaluation is not always accurate. Please
+                          use this evaluation as a reference and further
+                          investigate if necessary.
+                        </p>
+                      </DialogFooter>
                     </DialogContent>
                   </Dialog>
                 )}

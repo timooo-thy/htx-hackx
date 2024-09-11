@@ -5,7 +5,14 @@ export const getAllActivities = query({
   args: {},
   handler: async (ctx, _) => {
     const activities = await ctx.db.query("activity").order("desc").collect();
-    return activities;
+    const activitiesWithOfficerNames = await Promise.all(
+      activities.map(async (activity) => {
+        const officerName = await ctx.db.get(activity.officerId);
+        return { ...activity, officerName: officerName?.name ?? "" };
+      })
+    );
+
+    return activitiesWithOfficerNames;
   },
 });
 

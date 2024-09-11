@@ -15,6 +15,8 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { DownloadIcon, SearchIcon } from "lucide-react";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
 type TrainingJob = {
   id: string;
@@ -25,23 +27,8 @@ type TrainingJob = {
 };
 
 export function YoloDashboard() {
+  const trainingJobs = useQuery(api.trainingJob.getAllTrainingJobs, {});
   const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [trainingJobs, setTrainingJobs] = useState<TrainingJob[]>([
-    {
-      id: "1",
-      name: "Suspicious behavior model",
-      status: "completed",
-      progress: 100,
-      createdAt: "2023-06-15 09:30",
-    },
-    {
-      id: "2",
-      name: "Object detection model",
-      status: "training",
-      progress: 65,
-      createdAt: "2023-06-15 14:45",
-    },
-  ]);
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,60 +37,61 @@ export function YoloDashboard() {
     }
   };
 
-  const handleUpload = async () => {
-    if (!videoFile) {
-      toast.error("Please select a video file to upload.");
-      return;
-    }
+  // const handleUpload = async () => {
+  //   if (!videoFile) {
+  //     toast.error("Please select a video file to upload.");
+  //     return;
+  //   }
 
-    // Simulate file upload and job creation
-    const newJob: TrainingJob = {
-      id: String(trainingJobs.length + 1),
-      name: videoFile.name,
-      status: "queued",
-      progress: 0,
-      createdAt: new Date().toISOString().slice(0, 16).replace("T", " "),
-    };
+  //   // Simulate file upload and job creation
+  //   const newJob: TrainingJob = {
+  //     id: String(trainingJobs.length + 1),
+  //     name: videoFile.name,
+  //     status: "queued",
+  //     progress: 0,
+  //     createdAt: new Date().toISOString().slice(0, 16).replace("T", " "),
+  //   };
 
-    setTrainingJobs((prev) => [...prev, newJob]);
-    setVideoFile(null);
+  //   setTrainingJobs((prev) => [...prev, newJob]);
+  //   setVideoFile(null);
 
-    toast.success("Video uploaded and training job created successfully.");
+  //   toast.success("Video uploaded and training job created successfully.");
 
-    // Simulate training progress
-    let progress = 0;
-    const intervalId = setInterval(() => {
-      progress += 10;
-      setTrainingJobs((prev) =>
-        prev.map((job) =>
-          job.id === newJob.id
-            ? {
-                ...job,
-                status: progress < 100 ? "training" : "completed",
-                progress: Math.min(progress, 100),
-              }
-            : job
-        )
-      );
-      if (progress >= 100) {
-        clearInterval(intervalId);
-      }
-    }, 2000);
-  };
+  //   // Simulate training progress
+  //   let progress = 0;
+  //   const intervalId = setInterval(() => {
+  //     progress += 10;
+  //     setTrainingJobs((prev) =>
+  //       prev.map((job) =>
+  //         job.id === newJob.id
+  //           ? {
+  //               ...job,
+  //               status: progress < 100 ? "training" : "completed",
+  //               progress: Math.min(progress, 100),
+  //             }
+  //           : job
+  //       )
+  //     );
+  //     if (progress >= 100) {
+  //       clearInterval(intervalId);
+  //     }
+  //   }, 2000);
+  // };
 
-  const filteredJobs = trainingJobs.filter((job) =>
-    job.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredJobs =
+    trainingJobs?.filter((job) =>
+      job.jobName.toLowerCase().includes(searchTerm.toLowerCase())
+    ) ?? [];
 
   const handleExport = () => {
     const csvContent = [
       ["ID", "Name", "Status", "Progress", "Created At"],
       ...filteredJobs.map((job) => [
-        job.id,
-        job.name,
+        job._id,
+        job.jobName,
         job.status,
         job.progress,
-        job.createdAt,
+        job._creationTime,
       ]),
     ]
       .map((e) => e.join(","))
@@ -137,9 +125,7 @@ export function YoloDashboard() {
           detection.
         </p>
       </div>
-      <Button onClick={handleUpload} disabled={!videoFile}>
-        Upload and Start Training
-      </Button>
+      <Button disabled={!videoFile}>Upload and Start Training</Button>
 
       <div className="flex justify-between items-center">
         <div className="relative">
@@ -168,8 +154,8 @@ export function YoloDashboard() {
         </TableHeader>
         <TableBody>
           {filteredJobs.map((job) => (
-            <TableRow key={job.id}>
-              <TableCell>{job.name}</TableCell>
+            <TableRow key={job._id}>
+              <TableCell>{job.jobName}</TableCell>
               <TableCell>{job.status}</TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
@@ -177,7 +163,9 @@ export function YoloDashboard() {
                   <span>{job.progress}%</span>
                 </div>
               </TableCell>
-              <TableCell>{job.createdAt}</TableCell>
+              <TableCell>
+                {new Date(job._creationTime).toLocaleString()}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
