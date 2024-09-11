@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { DownloadIcon, SearchIcon } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { useDebounce } from "@/lib/hooks";
 
 type TrainingJob = {
   id: string;
@@ -30,6 +31,7 @@ export function YoloDashboard() {
   const trainingJobs = useQuery(api.trainingJob.getAllTrainingJobs, {});
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -80,7 +82,7 @@ export function YoloDashboard() {
 
   const filteredJobs =
     trainingJobs?.filter((job) =>
-      job.jobName.toLowerCase().includes(searchTerm.toLowerCase())
+      job.jobName.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     ) ?? [];
 
   const handleExport = () => {

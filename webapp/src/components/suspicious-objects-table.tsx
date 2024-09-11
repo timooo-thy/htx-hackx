@@ -25,10 +25,12 @@ import { DownloadIcon, SearchIcon } from "lucide-react";
 import Image from "next/image";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { useDebounce } from "@/lib/hooks";
 
 export function SuspiciousObjectsTable() {
   const objects = useQuery(api.activity.getSuspiciousActivities, {});
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   // const handleEvaluate = async (id: string) => {
   //   // Simulate AI evaluation
@@ -49,8 +51,10 @@ export function SuspiciousObjectsTable() {
   const filteredObjects =
     objects?.filter(
       (obj) =>
-        obj.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        obj.location.toLowerCase().includes(searchTerm.toLowerCase())
+        obj.description
+          .toLowerCase()
+          .includes(debouncedSearchTerm.toLowerCase()) ||
+        obj.location.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     ) ?? [];
 
   const handleExport = () => {
@@ -138,12 +142,15 @@ export function SuspiciousObjectsTable() {
                         {object.location}
                       </DialogDescription>
                     </DialogHeader>
-                    <Image
-                      src={object.imageUrl ?? ""}
-                      alt="Suspicious object"
-                      width="100"
-                      height="100"
-                    />
+                    <div className="flex justify-center items-center">
+                      <Image
+                        src={object.imageUrl ?? ""}
+                        alt="Suspicious object"
+                        width="250"
+                        height="200"
+                        quality={100}
+                      />
+                    </div>
                   </DialogContent>
                 </Dialog>
               </TableCell>
