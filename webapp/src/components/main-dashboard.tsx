@@ -15,7 +15,6 @@ import { PatrolMap } from "./patrol-map";
 import { YoloDashboard } from "./yolo-dashboard";
 import { SuspiciousObjectsTable } from "./suspicious-objects-table";
 import StatsCard from "./stats-card";
-import { statsCardData } from "@/lib/data";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Doc } from "../../convex/_generated/dataModel";
@@ -56,8 +55,8 @@ export function MainDashboard({ userName }: MainDashboardProps) {
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {statsCardData.map((card, i) => (
-              <StatsCard {...card} key={i} onClick={handleTabChange} />
+            {tabsOverviewData?.map((card) => (
+              <StatsCard data={card} key={card._id} onClick={handleTabChange} />
             ))}
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">

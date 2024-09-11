@@ -10,7 +10,10 @@ export default defineSchema({
       v.literal("calls")
     ),
     label: v.string(),
-    title: v.string(),
+    chartTitle: v.string(),
+    cardTitle: v.string(),
+    totalNumber: v.number(),
+    cardDescription: v.string(),
     chartData: v.array(
       v.object({
         month: v.string(),

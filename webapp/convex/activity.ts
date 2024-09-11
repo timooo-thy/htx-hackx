@@ -1,5 +1,6 @@
+import { v } from "convex/values";
 import { Id } from "./_generated/dataModel";
-import { query } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 
 export const getAllActivities = query({
   args: {},
@@ -35,5 +36,47 @@ export const getSuspiciousActivities = query({
     );
 
     return activitiesWithImageUrls;
+  },
+});
+
+export const generateUploadUrl = mutation(async (ctx) => {
+  return await ctx.storage.generateUploadUrl();
+});
+
+export const postActivity = mutation({
+  args: {
+    title: v.string(),
+    officerId: v.id("officers"),
+    description: v.string(),
+    location: v.string(),
+    imageId: v.optional(v.id("_storage")),
+    status: v.union(v.literal("pending"), v.literal("evaluated")),
+    aiEvaluation: v.optional(v.string()),
+    aiEvaluationScore: v.optional(v.number()),
+  },
+  handler: async (
+    ctx,
+    {
+      title,
+      officerId,
+      description,
+      location,
+      imageId,
+      status,
+      aiEvaluation,
+      aiEvaluationScore,
+    }
+  ) => {
+    const activity = await ctx.db.insert("activity", {
+      title,
+      officerId,
+      description,
+      location,
+      imageId,
+      status,
+      aiEvaluation,
+      aiEvaluationScore,
+    });
+    return activity;
   },
 });

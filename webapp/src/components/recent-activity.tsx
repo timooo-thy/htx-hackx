@@ -7,7 +7,6 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Separator } from "./ui/separator";
-import { recentActivities } from "@/lib/data";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
