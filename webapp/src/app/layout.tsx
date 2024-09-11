@@ -4,6 +4,7 @@ import "./globals.css";
 import ConvexProvider from "./providers";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className}`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -29,6 +30,7 @@ export default function RootLayout({
           <ConvexProvider>
             <Navbar />
             {children}
+            <Toaster richColors />
           </ConvexProvider>
         </ThemeProvider>
       </body>
