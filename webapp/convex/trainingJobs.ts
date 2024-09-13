@@ -12,6 +12,10 @@ export const getAllTrainingJobs = query({
   },
 });
 
+export const generateUploadUrl = mutation(async (ctx) => {
+  return await ctx.storage.generateUploadUrl();
+});
+
 export const postTrainingJob = mutation({
   args: {
     status: v.union(v.literal("training"), v.literal("completed")),
@@ -26,6 +30,23 @@ export const postTrainingJob = mutation({
       videoIds,
       jobName,
       maskedImageIds: [],
+    });
+    return trainingJob;
+  },
+});
+
+export const updateTrainingJob = mutation({
+  args: {
+    id: v.id("trainingJobs"),
+    status: v.union(v.literal("training"), v.literal("completed")),
+    progress: v.number(),
+    maskedImageIds: v.array(v.string()),
+  },
+  handler: async (ctx, { id, status, progress, maskedImageIds }) => {
+    const trainingJob = await ctx.db.patch(id, {
+      status,
+      progress,
+      maskedImageIds,
     });
     return trainingJob;
   },
