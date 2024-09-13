@@ -28,7 +28,7 @@ type TrainingJob = {
 };
 
 export function YoloDashboard() {
-  const trainingJobs = useQuery(api.trainingJob.getAllTrainingJobs, {});
+  const trainingJobs = useQuery(api.trainingJobs.getAllTrainingJobs, {});
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);

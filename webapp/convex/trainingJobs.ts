@@ -25,6 +25,7 @@ export const postTrainingJob = mutation({
       progress,
       videoIds,
       jobName,
+      maskedImageIds: [],
     });
     return trainingJob;
   },

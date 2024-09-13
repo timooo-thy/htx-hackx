@@ -43,5 +43,6 @@ export default defineSchema({
     status: v.union(v.literal("training"), v.literal("completed")),
     progress: v.number(),
     videoIds: v.array(v.string()),
+    maskedImageIds: v.array(v.string()),
   }),
 });
