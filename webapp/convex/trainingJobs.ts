@@ -12,6 +12,14 @@ export const getAllTrainingJobs = query({
   },
 });
 
+export const getTrainingJobById = query({
+  args: { jobId: v.id("trainingJobs") },
+  handler: async (ctx, { jobId }) => {
+    const trainingJob = await ctx.db.get(jobId);
+    return trainingJob;
+  },
+});
+
 export const generateUploadUrl = mutation(async (ctx) => {
   return await ctx.storage.generateUploadUrl();
 });
