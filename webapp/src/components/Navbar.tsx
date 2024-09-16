@@ -24,8 +24,7 @@ export default function Navbar() {
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
             <Link href="/dashboard">Dashboard</Link>
-            <Link href="/reports">Reports</Link>
-            <Link href="/analytics">Analytics</Link>
+            <Link href="/models">Models</Link>
           </nav>
         </div>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
