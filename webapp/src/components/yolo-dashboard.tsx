@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,37 +13,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
-import { toast } from "sonner";
-import {
-  Carousel,
-  CarouselApi,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { DownloadIcon, EllipsisVerticalIcon, SearchIcon } from "lucide-react";
+import { DownloadIcon, SearchIcon } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useDebounce } from "@/lib/hooks";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import Image from "next/image";
-import { FunctionReturnType } from "convex/server";
+import { startTraining } from "@/actions/trainingActions";
+import { toast } from "sonner";
+import TrainingFormButton from "./training-form-button";
+import ActionsDropDown from "./actions-dropdown";
 
 export function YoloDashboard() {
   const trainingJobs = useQuery(
@@ -51,8 +28,10 @@ export function YoloDashboard() {
     {}
   );
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [description, setDescription] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const videoFileRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -106,6 +85,12 @@ export function YoloDashboard() {
       job.jobName.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     ) ?? [];
 
+  const clearFileInput = () => {
+    if (videoFileRef.current) {
+      videoFileRef.current.value = "";
+    }
+  };
+
   const handleExport = () => {
     const csvContent = [
       [
@@ -143,7 +128,22 @@ export function YoloDashboard() {
 
   return (
     <div className="space-y-6">
-      <form className="grid gap-y-4">
+      <form
+        className="grid gap-y-4"
+        action={async (formData) => {
+          const response = await startTraining(formData);
+          if (response.error) {
+            toast.error(response.error);
+          } else {
+            toast.success(
+              "Video uploaded and training job created successfully"
+            );
+            setVideoFile(null);
+            clearFileInput();
+            setDescription("");
+          }
+        }}
+      >
         <div className="flex gap-x-4">
           <div className="grid w-full max-w-sm items-center gap-1.5">
             <Label htmlFor="video-upload">Upload Suspicious Video</Label>
@@ -151,7 +151,9 @@ export function YoloDashboard() {
               id="video-upload"
               type="file"
               accept="video/*"
+              name="video"
               onChange={handleFileChange}
+              ref={videoFileRef}
             />
             <p className="text-sm text-muted-foreground">
               Upload videos to train the YOLOv8 model for suspicious behavior
@@ -159,17 +161,20 @@ export function YoloDashboard() {
             </p>
           </div>
           <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="video-descriptin">Enter Object Description</Label>
-            <Input id="video-description" onChange={handleFileChange} />
+            <Label htmlFor="video-description">Enter Object Description</Label>
+            <Input
+              id="video-description"
+              name="description"
+              onChange={(e) => setDescription(e.target.value)}
+              value={description}
+            />
             <p className="text-sm text-muted-foreground">
               Enter the object description to mask and train the YOLOv8 model
               for suspicious object detection.
             </p>
           </div>
         </div>
-        <Button disabled={!videoFile} type="submit" className="w-[200px]">
-          Upload and Mask Images
-        </Button>
+        <TrainingFormButton fileSelected={!!videoFile} />
       </form>
 
       <div className="flex justify-between items-center">
@@ -232,96 +237,3 @@ export function YoloDashboard() {
     </div>
   );
 }
-
-const ActionsDropDown = ({
-  job,
-}: {
-  job: FunctionReturnType<
-    typeof api.trainingJobs.getAllTrainingJobsWithUrls
-  >[number];
-}) => {
-  const [current, setCurrent] = useState(1);
-  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
-
-  useEffect(() => {
-    if (!carouselApi) {
-      return;
-    }
-
-    setCurrent(carouselApi.selectedScrollSnap() + 1);
-
-    carouselApi.on("select", () => {
-      setCurrent(carouselApi.selectedScrollSnap() + 1);
-    });
-  }, [carouselApi]);
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="link" className="w-[50px]">
-          <EllipsisVerticalIcon />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button
-              disabled={job.imageUrls.length === 0}
-              variant={"ghost"}
-              className="text-xs w-full px-2 py-1.5 outline-none font-normal h-[32px] justify-start"
-            >
-              View Images
-            </Button>
-          </DialogTrigger>
-          <DialogContent
-            className="sm:max-w-[425px]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <DialogHeader>
-              <DialogTitle>Masked Images</DialogTitle>
-              <DialogDescription>
-                Florence2 and SAM2 (Detection and Segmentation)
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex justify-center items-center flex-col">
-              <Carousel className="w-4/5" setApi={setCarouselApi}>
-                <CarouselContent className="w-full ml-0 pl-4">
-                  {job.imageUrls.map((imageUrl) => (
-                    <CarouselItem key={imageUrl}>
-                      <Image
-                        src={imageUrl ?? ""}
-                        alt="Masked Image"
-                        width="250"
-                        height="200"
-                        quality={100}
-                      />
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
-              </Carousel>
-              <div className="py-2 text-center text-sm text-muted-foreground">
-                Masked Image {current} of {job.imageUrls.length}
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-        <DropdownMenuItem
-          className="text-xs h-[32px]"
-          disabled={
-            job.segmentingProgress < 100 ||
-            job.status === "training" ||
-            job.status === "trained"
-          }
-        >
-          {job.status === "completed" || job.status === "segmenting"
-            ? "Start Training"
-            : "Training..."}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};

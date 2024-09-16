@@ -156,11 +156,10 @@ export function SuspiciousObjectsTable() {
               </TableCell>
               <TableCell>
                 <Badge
-                  variant={
-                    object.status === "pending" ? "destructive" : "secondary"
-                  }
+                  className={`${object.status === "evaluated" ? "bg-green-600" : "bg-red-600"}  text-white w-full flex justify-center items-center`}
                 >
-                  {object.status}
+                  {object.status.charAt(0).toUpperCase() +
+                    object.status.slice(1)}
                 </Badge>
               </TableCell>
               <TableCell>
