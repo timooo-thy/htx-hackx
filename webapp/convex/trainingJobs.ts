@@ -49,15 +49,20 @@ export const generateUploadUrl = mutation(async (ctx) => {
 
 export const postTrainingJob = mutation({
   args: {
-    status: v.union(v.literal("training"), v.literal("completed")),
-    progress: v.number(),
+    status: v.union(
+      v.literal("segmenting"),
+      v.literal("training"),
+      v.literal("completed"),
+      v.literal("trained")
+    ),
     videoIds: v.array(v.string()),
     jobName: v.string(),
   },
-  handler: async (ctx, { status, progress, videoIds, jobName }) => {
+  handler: async (ctx, { status, videoIds, jobName }) => {
     const trainingJob = await ctx.db.insert("trainingJobs", {
       status,
-      progress,
+      trainingProgress: 0,
+      segmentingProgress: 0,
       videoIds,
       jobName,
       maskedImageIds: [],
@@ -69,14 +74,26 @@ export const postTrainingJob = mutation({
 export const updateTrainingJob = mutation({
   args: {
     id: v.id("trainingJobs"),
-    status: v.union(v.literal("training"), v.literal("completed")),
-    progress: v.number(),
-    maskedImageIds: v.array(v.string()),
+    status: v.optional(
+      v.union(
+        v.literal("segmenting"),
+        v.literal("training"),
+        v.literal("completed"),
+        v.literal("trained")
+      )
+    ),
+    trainingProgress: v.optional(v.number()),
+    segmentingProgress: v.optional(v.number()),
+    maskedImageIds: v.optional(v.array(v.string())),
   },
-  handler: async (ctx, { id, status, progress, maskedImageIds }) => {
+  handler: async (
+    ctx,
+    { id, status, segmentingProgress, trainingProgress, maskedImageIds }
+  ) => {
     const trainingJob = await ctx.db.patch(id, {
       status,
-      progress,
+      segmentingProgress,
+      trainingProgress,
       maskedImageIds,
     });
     return trainingJob;

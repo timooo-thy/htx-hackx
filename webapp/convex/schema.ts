@@ -40,8 +40,14 @@ export default defineSchema({
   }),
   trainingJobs: defineTable({
     jobName: v.string(),
-    status: v.union(v.literal("training"), v.literal("completed")),
-    progress: v.number(),
+    status: v.union(
+      v.literal("segmenting"),
+      v.literal("training"),
+      v.literal("completed"),
+      v.literal("trained")
+    ),
+    trainingProgress: v.number(),
+    segmentingProgress: v.number(),
     videoIds: v.array(v.string()),
     maskedImageIds: v.array(v.string()),
   }),

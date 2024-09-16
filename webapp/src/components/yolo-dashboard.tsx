@@ -108,12 +108,20 @@ export function YoloDashboard() {
 
   const handleExport = () => {
     const csvContent = [
-      ["ID", "Name", "Status", "Progress", "Created At"],
+      [
+        "ID",
+        "Name",
+        "Status",
+        "Segmenting Progress",
+        "Training Progress",
+        "Created At",
+      ],
       ...filteredJobs.map((job) => [
         job._id,
         job.jobName,
         job.status,
-        job.progress,
+        job.segmentingProgress,
+        job.trainingProgress,
         job._creationTime,
       ]),
     ]
@@ -185,11 +193,9 @@ export function YoloDashboard() {
           <TableRow>
             <TableHead>Job Name</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Progress</TableHead>
-
-            <TableHead className="flex justify-center items-center">
-              Created At
-            </TableHead>
+            <TableHead>Segmenting Progress</TableHead>
+            <TableHead>Training Progress</TableHead>
+            <TableHead>Created At</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -200,11 +206,20 @@ export function YoloDashboard() {
               <TableCell>{job.status}</TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <Progress value={job.progress} className="w-[60%]" />
-                  <span>{job.progress}%</span>
+                  <Progress
+                    value={job.segmentingProgress}
+                    className="w-[60%]"
+                  />
+                  <span>{job.segmentingProgress}%</span>
                 </div>
               </TableCell>
-              <TableCell className="flex justify-center items-center">
+              <TableCell>
+                <div className="flex items-center gap-2">
+                  <Progress value={job.trainingProgress} className="w-[60%]" />
+                  <span>{job.trainingProgress}%</span>
+                </div>
+              </TableCell>
+              <TableCell className="">
                 {new Date(job._creationTime).toLocaleString()}
               </TableCell>
               <TableCell>
@@ -289,16 +304,22 @@ const ActionsDropDown = ({
                 <CarouselNext />
               </Carousel>
               <div className="py-2 text-center text-sm text-muted-foreground">
-                Slide {current} of {job.imageUrls.length}
+                Masked Image {current} of {job.imageUrls.length}
               </div>
             </div>
           </DialogContent>
         </Dialog>
         <DropdownMenuItem
           className="text-xs h-[32px]"
-          disabled={job.status === "training"}
+          disabled={
+            job.segmentingProgress < 100 ||
+            job.status === "training" ||
+            job.status === "trained"
+          }
         >
-          Start Training
+          {job.status === "completed" || job.status === "segmenting"
+            ? "Start Training"
+            : "Training..."}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
