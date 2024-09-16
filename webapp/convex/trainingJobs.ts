@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
 
 export const getAllTrainingJobs = query({
   args: {},
@@ -9,6 +10,28 @@ export const getAllTrainingJobs = query({
       .order("desc")
       .collect();
     return trainingJobs;
+  },
+});
+
+export const getAllTrainingJobsWithUrls = query({
+  args: {},
+  handler: async (ctx, _) => {
+    const trainingJobs = await ctx.db
+      .query("trainingJobs")
+      .order("desc")
+      .collect();
+
+    const trainingJobsWithUrls = await Promise.all(
+      trainingJobs.map(async (trainingJob) => {
+        const imageUrls = await Promise.all(
+          trainingJob.maskedImageIds.map(async (imageId) => {
+            return await ctx.storage.getUrl(imageId as Id<"_storage">);
+          })
+        );
+        return { ...trainingJob, imageUrls };
+      })
+    );
+    return trainingJobsWithUrls;
   },
 });
 
