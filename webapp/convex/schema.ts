@@ -44,7 +44,8 @@ export default defineSchema({
       v.literal("segmenting"),
       v.literal("training"),
       v.literal("completed"),
-      v.literal("trained")
+      v.literal("trained"),
+      v.literal("deployed")
     ),
     trainingProgress: v.number(),
     segmentingProgress: v.number(),

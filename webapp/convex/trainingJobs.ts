@@ -35,6 +35,34 @@ export const getAllTrainingJobsWithUrls = query({
   },
 });
 
+export const getAllTrainingJobsWithWeights = query({
+  args: {},
+  handler: async (ctx, _) => {
+    const trainingJobs = await ctx.db
+      .query("trainingJobs")
+      .filter((q) =>
+        q.not(
+          q.or(
+            q.eq(q.field("status"), "segmenting"),
+            q.eq(q.field("status"), "completed")
+          )
+        )
+      )
+      .order("desc")
+      .collect();
+
+    const trainingJobsWithWeights = await Promise.all(
+      trainingJobs.map(async (trainingJob) => {
+        const modelFile = await ctx.storage.getUrl(
+          trainingJob.trainedModelFile as Id<"_storage">
+        );
+        return { ...trainingJob, modelFile };
+      })
+    );
+    return trainingJobsWithWeights;
+  },
+});
+
 export const getTrainingJobById = query({
   args: { jobId: v.id("trainingJobs") },
   handler: async (ctx, { jobId }) => {
@@ -53,7 +81,8 @@ export const postTrainingJob = mutation({
       v.literal("segmenting"),
       v.literal("training"),
       v.literal("completed"),
-      v.literal("trained")
+      v.literal("trained"),
+      v.literal("deployed")
     ),
     videoIds: v.array(v.string()),
     jobName: v.string(),
@@ -73,37 +102,46 @@ export const postTrainingJob = mutation({
 
 export const updateTrainingJob = mutation({
   args: {
-    id: v.id("trainingJobs"),
+    _id: v.id("trainingJobs"),
+    _creationTime: v.number(),
     status: v.optional(
       v.union(
         v.literal("segmenting"),
         v.literal("training"),
         v.literal("completed"),
-        v.literal("trained")
+        v.literal("trained"),
+        v.literal("deployed")
       )
     ),
+    jobName: v.optional(v.string()),
     trainingProgress: v.optional(v.number()),
     segmentingProgress: v.optional(v.number()),
     maskedImageIds: v.optional(v.array(v.string())),
     trainedModelFile: v.optional(v.string()),
+    modelFile: v.optional(v.string()),
+    videoIds: v.optional(v.array(v.string())),
   },
   handler: async (
     ctx,
     {
-      id,
+      _id,
       status,
       segmentingProgress,
       trainingProgress,
       maskedImageIds,
       trainedModelFile,
+      jobName,
+      videoIds,
     }
   ) => {
-    const trainingJob = await ctx.db.patch(id, {
+    const trainingJob = await ctx.db.patch(_id, {
+      jobName,
       status,
       segmentingProgress,
       trainingProgress,
       maskedImageIds,
       trainedModelFile,
+      videoIds,
     });
     return trainingJob;
   },
