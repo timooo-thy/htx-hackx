@@ -50,5 +50,6 @@ export default defineSchema({
     segmentingProgress: v.number(),
     videoIds: v.array(v.string()),
     maskedImageIds: v.array(v.string()),
+    trainedModelFile: v.optional(v.string()),
   }),
 });

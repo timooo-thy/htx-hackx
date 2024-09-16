@@ -85,16 +85,25 @@ export const updateTrainingJob = mutation({
     trainingProgress: v.optional(v.number()),
     segmentingProgress: v.optional(v.number()),
     maskedImageIds: v.optional(v.array(v.string())),
+    trainedModelFile: v.optional(v.string()),
   },
   handler: async (
     ctx,
-    { id, status, segmentingProgress, trainingProgress, maskedImageIds }
+    {
+      id,
+      status,
+      segmentingProgress,
+      trainingProgress,
+      maskedImageIds,
+      trainedModelFile,
+    }
   ) => {
     const trainingJob = await ctx.db.patch(id, {
       status,
       segmentingProgress,
       trainingProgress,
       maskedImageIds,
+      trainedModelFile,
     });
     return trainingJob;
   },
