@@ -22,7 +22,7 @@ export const getSuspiciousActivities = query({
   handler: async (ctx, _) => {
     const activities = await ctx.db
       .query("activity")
-      .filter((q) => q.not(q.eq(q.field("imageId"), undefined)))
+      .filter((q) => q.eq(q.field("title"), "Patrol Update"))
       .order("desc")
       .collect();
 
