@@ -26,6 +26,7 @@ import Image from "next/image";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useDebounce } from "@/lib/hooks";
+import { LoadingSpinner } from "./loading-spinner";
 
 export function SuspiciousObjectsTable() {
   const objects = useQuery(api.activity.getSuspiciousActivities, {});
@@ -112,12 +113,12 @@ export function SuspiciousObjectsTable() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Reported At</TableHead>
-            <TableHead>Location</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Image</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Action</TableHead>
+            <TableHead className="text-center">Reported At</TableHead>
+            <TableHead className="text-center">Location</TableHead>
+            <TableHead className="text-center">Description</TableHead>
+            <TableHead className="text-center">Image</TableHead>
+            <TableHead className="text-center">Status</TableHead>
+            <TableHead className="text-center">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -162,9 +163,11 @@ export function SuspiciousObjectsTable() {
                     object.status.slice(1)}
                 </Badge>
               </TableCell>
-              <TableCell>
+              <TableCell className="">
                 {object.status === "pending" ? (
-                  <Button>Evaluate</Button>
+                  <Button variant="outline" disabled>
+                    View Evaluation
+                  </Button>
                 ) : (
                   <Dialog>
                     <DialogTrigger asChild>
