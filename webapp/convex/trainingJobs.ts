@@ -43,7 +43,8 @@ export const getAllTrainingJobsWithWeights = query({
       .filter((q) =>
         q.or(
           q.eq(q.field("status"), "trained"),
-          q.eq(q.field("status"), "deployed")
+          q.eq(q.field("status"), "deployed"),
+          q.eq(q.field("status"), "training")
         )
       )
       .order("desc")
@@ -51,6 +52,9 @@ export const getAllTrainingJobsWithWeights = query({
 
     const trainingJobsWithWeights = await Promise.all(
       trainingJobs.map(async (trainingJob) => {
+        if (!trainingJob.trainedModelFile) {
+          return { ...trainingJob, modelFile: "" };
+        }
         const modelFile = await ctx.storage.getUrl(
           trainingJob.trainedModelFile as Id<"_storage">
         );

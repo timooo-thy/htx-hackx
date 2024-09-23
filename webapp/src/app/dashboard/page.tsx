@@ -7,7 +7,7 @@ export default async function Dashboard() {
   const user = await currentUser();
 
   return (
-    <main className="w-5/6 m-auto pb-8">
+    <main className="w-5/6 m-auto pb-8 min-h-[calc(100vh-144px)]">
       <MainDashboard userName={user?.firstName ?? ""} isAdmin={isAdmin} />
     </main>
   );

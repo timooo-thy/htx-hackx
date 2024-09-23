@@ -105,7 +105,9 @@ export default function ModelsPage() {
                   <FileText className="mr-2 h-4 w-4" />
                   <span className="text-sm text-muted-foreground">
                     Weights:{" "}
-                    {job.trainedModelFile + ".pt" || "Training in Progress..."}
+                    {job.trainedModelFile
+                      ? job.trainedModelFile + ".pt"
+                      : "Training in Progress..."}
                   </span>
                 </div>
                 <div className="flex items-center">
