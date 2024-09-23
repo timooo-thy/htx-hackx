@@ -92,8 +92,16 @@ export const postActivity = mutation({
 });
 
 export const updateActivity = mutation({
-  args: { id: v.id("activity"), aiEvaluation: v.string(), aiEvaluationScore: v.number() },
+  args: {
+    id: v.id("activity"),
+    aiEvaluation: v.string(),
+    aiEvaluationScore: v.number(),
+  },
   handler: async (ctx, { id, aiEvaluation, aiEvaluationScore }) => {
-    await ctx.db.patch(id, {aiEvaluation, aiEvaluationScore, status: "evaluated"});
+    await ctx.db.patch(id, {
+      aiEvaluation,
+      aiEvaluationScore,
+      status: "evaluated",
+    });
   },
 });
