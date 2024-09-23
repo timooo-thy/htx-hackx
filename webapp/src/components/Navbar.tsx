@@ -1,51 +1,31 @@
 "use client";
 
-import { SignInButton, UserButton } from "@clerk/nextjs";
+import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import { Authenticated, Unauthenticated } from "convex/react";
-import { useState } from "react";
 import Link from "next/link";
-import { Shield, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Shield } from "lucide-react";
 import { ModeToggle } from "./ModeToggle";
 
 export default function Navbar() {
-  const [showSearch, setShowSearch] = useState(false);
-
+  const { isSignedIn } = useUser();
   return (
-    <header className="flex justify-center items-center h-20 sticky top-0 z-50 w-5/6 m-auto border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="w-full px-10 md:px-0 flex justify-center items-center h-20 sticky top-0 z-50 m-auto bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/30">
       <div className="container flex h-14 items-center">
-        <div className="mr-4 hidden md:flex">
+        <div className="mr-4 flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <Shield className="h-6 w-6" />
-            <span className="hidden font-bold sm:inline-block">
+            <span className="hidden font-bold sm:inline-block md:flex">
               HTX Sentinel
             </span>
           </Link>
-          <nav className="flex items-center space-x-6 text-sm font-medium">
-            <Link href="/dashboard">Dashboard</Link>
-            <Link href="/models">Models</Link>
-          </nav>
+          {isSignedIn && (
+            <nav className="flex items-center space-x-6 text-sm font-medium">
+              <Link href="/dashboard">Dashboard</Link>
+              <Link href="/models">Models</Link>
+            </nav>
+          )}
         </div>
-        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <div className="w-full flex-1 md:w-auto md:flex-none">
-            {showSearch ? (
-              <Input
-                type="search"
-                placeholder="Search..."
-                className="md:w-[300px]"
-              />
-            ) : (
-              <Button
-                variant="outline"
-                onClick={() => setShowSearch(true)}
-                className="ml-auto"
-              >
-                <Search className="h-4 w-4 mr-2" />
-                Search
-              </Button>
-            )}
-          </div>
+        <div className="flex flex-1 items-center space-x-2 justify-end">
           <div className="flex gap-x-4">
             <ModeToggle />
             <Unauthenticated>

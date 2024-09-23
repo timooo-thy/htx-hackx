@@ -5,6 +5,7 @@ import ConvexProvider from "./providers";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
+import Footer from "@/components/footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,6 +31,7 @@ export default function RootLayout({
           <ConvexProvider>
             <Navbar />
             {children}
+            <Footer />
             <Toaster richColors />
           </ConvexProvider>
         </ThemeProvider>

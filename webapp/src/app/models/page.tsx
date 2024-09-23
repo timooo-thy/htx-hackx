@@ -50,7 +50,7 @@ export default function ModelsPage() {
       ...prevModel,
       _id: deployedModel as Id<"trainingJobs">,
       status: "trained",
-      modelFile: prevModel.modelFile ?? undefined,
+      trainedModelFile: prevModel.modelFile ?? undefined,
     });
 
     // Deploy the selected model
@@ -58,7 +58,7 @@ export default function ModelsPage() {
       ...newModel,
       _id: newJobId,
       status: "deployed",
-      modelFile: newModel.modelFile ?? undefined,
+      trainedModelFile: newModel.modelFile ?? undefined,
     });
 
     setDeployedModel(newJobId);
@@ -66,7 +66,7 @@ export default function ModelsPage() {
   };
 
   return (
-    <div className="min-h-[calc(min-h-dvh-80px)] w-5/6 m-auto pb-8">
+    <div className="min-h-[calc(100vh-144px)] w-5/6 m-auto">
       <h1 className="text-3xl font-bold tracking-tight py-6">YOLO v8 Models</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
         {trainingJobs?.map((job) => (
