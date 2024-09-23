@@ -44,7 +44,7 @@ export const getAllTrainingJobsWithWeights = query({
         q.not(
           q.or(
             q.eq(q.field("status"), "segmenting"),
-            q.eq(q.field("status"), "completed")
+            q.eq(q.field("status"), "segmented")
           )
         )
       )
@@ -80,7 +80,7 @@ export const postTrainingJob = mutation({
     status: v.union(
       v.literal("segmenting"),
       v.literal("training"),
-      v.literal("completed"),
+      v.literal("segmented"),
       v.literal("trained"),
       v.literal("deployed")
     ),
@@ -107,7 +107,7 @@ export const updateTrainingJob = mutation({
       v.union(
         v.literal("segmenting"),
         v.literal("training"),
-        v.literal("completed"),
+        v.literal("segmented"),
         v.literal("trained"),
         v.literal("deployed")
       )

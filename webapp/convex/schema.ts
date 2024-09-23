@@ -44,7 +44,7 @@ export default defineSchema({
     status: v.union(
       v.literal("segmenting"),
       v.literal("training"),
-      v.literal("completed"),
+      v.literal("segmented"),
       v.literal("trained"),
       v.literal("deployed")
     ),

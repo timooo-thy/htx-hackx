@@ -124,10 +124,10 @@ export default function ActionsDropDown({ job }: ActionsDropDownProps) {
         </Dialog>
         <DropdownMenuItem
           className="text-xs h-[32px]"
-          disabled={job.status !== "completed"}
+          disabled={job.status !== "segmented"}
           onClick={handleTraining}
         >
-          {job.status === "completed" || job.status === "segmenting"
+          {job.status === "segmented" || job.status === "segmenting"
             ? "Start Training"
             : job.status === "deployed" || job.status === "trained"
               ? "Trained"

@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "./ui/button";
 import { useFormStatus } from "react-dom";
+import { LoadingSpinner } from "./loading-spinner";
 
 type TrainingFormButtonProps = {
   fileSelected: boolean;
@@ -16,7 +17,11 @@ export default function TrainingFormButton({
       type="submit"
       className="w-[200px]"
     >
-      Upload and Mask Images
+      {pending ? (
+        <LoadingSpinner className="h-h w-5" />
+      ) : (
+        "Upload and Mask Images"
+      )}
     </Button>
   );
 }

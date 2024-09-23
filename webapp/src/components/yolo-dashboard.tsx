@@ -36,7 +36,7 @@ export function YoloDashboard() {
   useEffect(() => {
     if (trainingJobs && trainingJobs.length > 0) {
       const latestJob = trainingJobs[0];
-      if (latestJob.status === "completed") {
+      if (latestJob.status === "segmented") {
         toast.success("Completed Job", {
           description: `${latestJob.jobName} segmented successfully.`,
         });

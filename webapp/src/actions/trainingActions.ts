@@ -88,7 +88,7 @@ export async function startSegmenting(form: FormData) {
         maskedImageIds: imageIds,
         _id: jobId,
         segmentingProgress: 100,
-        status: "completed",
+        status: "segmented",
       });
     };
 
