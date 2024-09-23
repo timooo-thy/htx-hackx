@@ -51,13 +51,12 @@ def uploadFrame(client, frame, conf_score, class_name):
 
     activity_id = client.mutation("activity:postActivity", {
         "title": "Patrol Update",
-        "officerId": 'j97ffvdad66013dszgj4fd7c71718jgb',    # from officer's table
+        "officerId": 'jh7eyty2cyh4tz8kbcfqrm2v3s70kyna',    # from officer's table
         "description": f'Detected {class_name} near Northpoint',
-        "location": "Test Location",
+        "objectClass": class_name,
+        "location": "Yishun",
         "imageId": storage_id,
         "status": "pending",
-        "aiEvaluation": '',
-        "aiEvaluationScore": conf_score
     })
 
     storage_url = client.query("activity:getImageStorageUrl", {
@@ -123,7 +122,7 @@ def main():
     model = YOLO('yolov8n.pt', verbose=False)
     # model = YOLO('best.pt')
     print(model.model.names)
-    target_classes = ['backpack', 'handbag', 'suitcase', 'baseball bat', 'fork', 'knife', 'scissors']
+    target_classes = ['backpack', 'handbag', 'suitcase', 'baseball bat', 'fork', 'knife', 'scissors', 'cell phone']
     cap = cv2.VideoCapture(0)
     tracker = DeepSort(embedder='torchreid', max_age=6000)
     confirmed_track_ids = set()     # track_ids that have been confirmed before (but could be marked as deleted if not detected for a long time)
