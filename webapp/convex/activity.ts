@@ -43,6 +43,13 @@ export const generateUploadUrl = mutation(async (ctx) => {
   return await ctx.storage.generateUploadUrl();
 });
 
+export const getImageStorageUrl = query({
+  args: { imageId: v.id("_storage") },
+  handler: async (ctx, { imageId }) => {
+    return await ctx.storage.getUrl(imageId);
+  },
+});
+
 export const postActivity = mutation({
   args: {
     title: v.string(),
@@ -78,5 +85,12 @@ export const postActivity = mutation({
       aiEvaluationScore,
     });
     return activity;
+  },
+});
+
+export const updateActivity = mutation({
+  args: { id: v.id("activity"), aiEvaluation: v.string(), aiEvaluationScore: v.number() },
+  handler: async (ctx, { id, aiEvaluation, aiEvaluationScore }) => {
+    await ctx.db.patch(id, {aiEvaluation, aiEvaluationScore, status: "evaluated"});
   },
 });

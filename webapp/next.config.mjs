@@ -6,6 +6,10 @@ const nextConfig = {
         hostname: "capable-bee-948.convex.cloud",
         protocol: "https",
       },
+      {
+        hostname: "dusty-anaconda-555.convex.cloud",
+        protocol: "https",
+      }
     ],
   },
 };
