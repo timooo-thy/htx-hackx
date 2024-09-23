@@ -15,6 +15,18 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { toast } from "sonner";
 import { Id } from "../../../convex/_generated/dataModel";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { DialogClose } from "@radix-ui/react-dialog";
 
 export default function ModelsPage() {
   const trainingJobs = useQuery(
@@ -46,19 +58,26 @@ export default function ModelsPage() {
       return;
     }
 
+    const { jobName, modelFile, _creationTime, notified, ...rest } = prevModel;
+    const {
+      jobName: newJobName,
+      modelFile: newModelFile,
+      _creationTime: _newCreationTime,
+      notified: _newNotified,
+      ...newRest
+    } = newModel;
+
     await mutateDeployModel({
-      ...prevModel,
+      ...rest,
       _id: deployedModel as Id<"trainingJobs">,
       status: "trained",
-      trainedModelFile: prevModel.modelFile ?? undefined,
     });
 
     // Deploy the selected model
     await mutateDeployModel({
-      ...newModel,
+      ...newRest,
       _id: newJobId,
       status: "deployed",
-      trainedModelFile: newModel.modelFile ?? undefined,
     });
 
     setDeployedModel(newJobId);
@@ -106,17 +125,43 @@ export default function ModelsPage() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button
-                disabled={
-                  job.status === "deployed" ||
-                  deployedModel === job.jobName ||
-                  job.status === "training"
-                }
-                onClick={() => handleDeploy(deployedModel ?? "", job._id)}
-                className={`${job.status === "deployed" && "bg-green-600 text-white"} w-full`}
-              >
-                {deployedModel === job._id ? "Deployed" : "Deploy Model"}
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    disabled={
+                      job.status === "deployed" ||
+                      deployedModel === job.jobName ||
+                      job.status === "training"
+                    }
+                    className={`${job.status === "deployed" && "bg-green-600 text-white"} w-full`}
+                  >
+                    {deployedModel === job._id ? "Deployed" : "Deploy Model"}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Deploy Model</DialogTitle>
+                    <DialogDescription>
+                      <p>Are you sure you want to deploy the model?</p>
+                      <p>
+                        This will replace the currently deployed model and push
+                        the updates to the live system.
+                      </p>
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button
+                        onClick={() =>
+                          handleDeploy(deployedModel ?? "", job._id)
+                        }
+                      >
+                        Deploy
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </CardFooter>
           </Card>
         ))}
