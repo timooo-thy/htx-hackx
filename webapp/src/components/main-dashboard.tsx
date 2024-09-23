@@ -47,8 +47,16 @@ export function MainDashboard({ userName, isAdmin }: MainDashboardProps) {
       </div>
       <Tabs defaultValue="overview" className="space-y-8 md:space-y-4 ">
         <TabsList className="grid grid-cols-2 md:grid-cols-4 h-18 md:h-9">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="suspicious-objects">
+          <TabsTrigger
+            value="overview"
+            className={`${!isAdmin && "col-span-2"}`}
+          >
+            Overview
+          </TabsTrigger>
+          <TabsTrigger
+            value="suspicious-objects"
+            className={`${!isAdmin && "col-span-2"}`}
+          >
             Suspicious Objects
           </TabsTrigger>
           {isAdmin && (

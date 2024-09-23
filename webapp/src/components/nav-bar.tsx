@@ -4,10 +4,10 @@ import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import { Authenticated, Unauthenticated } from "convex/react";
 import Link from "next/link";
 import { Shield } from "lucide-react";
-import { ModeToggle } from "./ModeToggle";
+import { ModeToggle } from "./mode-toggle";
 
 export default function Navbar() {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
   return (
     <header className="w-full px-10 md:px-0 flex justify-center items-center h-20 sticky top-0 z-50 m-auto bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/30">
       <div className="container flex h-14 items-center">
@@ -21,7 +21,9 @@ export default function Navbar() {
           {isSignedIn && (
             <nav className="flex items-center space-x-6 text-sm font-medium">
               <Link href="/dashboard">Dashboard</Link>
-              <Link href="/models">Models</Link>
+              {user?.publicMetadata?.role === "admin" && (
+                <Link href="/models">Models</Link>
+              )}
             </nav>
           )}
         </div>
