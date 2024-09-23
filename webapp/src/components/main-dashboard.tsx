@@ -21,9 +21,10 @@ import { Doc } from "../../convex/_generated/dataModel";
 
 type MainDashboardProps = {
   userName: string;
+  isAdmin: boolean;
 };
 
-export function MainDashboard({ userName }: MainDashboardProps) {
+export function MainDashboard({ userName, isAdmin }: MainDashboardProps) {
   const [activeTab, setActiveTab] =
     useState<Doc<"tabsOverviewData">["keyName"]>("calls");
   const tabsOverviewData = useQuery(
@@ -50,8 +51,12 @@ export function MainDashboard({ userName }: MainDashboardProps) {
           <TabsTrigger value="suspicious-objects">
             Suspicious Objects
           </TabsTrigger>
-          <TabsTrigger value="patrol-map">Patrol Map</TabsTrigger>
-          <TabsTrigger value="yolo-training">YOLO Training</TabsTrigger>
+          {isAdmin && (
+            <>
+              <TabsTrigger value="patrol-map">Patrol Map</TabsTrigger>
+              <TabsTrigger value="yolo-training">YOLO Training</TabsTrigger>
+            </>
+          )}
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

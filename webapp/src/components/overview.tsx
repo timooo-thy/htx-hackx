@@ -18,7 +18,7 @@ type OverviewProps = {
   data: Doc<"tabsOverviewData">;
 };
 export function Overview({
-  data: { keyName, label, title, chartData, color },
+  data: { keyName, label, chartTitle, chartData, color },
 }: OverviewProps) {
   const chartConfig = {
     [keyName]: {
@@ -30,7 +30,7 @@ export function Overview({
   return (
     <Card className="h-full flex flex-col justify-between">
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
+        <CardTitle>{chartTitle}</CardTitle>
       </CardHeader>
       <CardContent className="pl-2">
         <ChartContainer config={chartConfig}>
