@@ -109,12 +109,15 @@ export default function ActionsDropDown({ job }: ActionsDropDownProps) {
           disabled={
             job.segmentingProgress < 100 ||
             job.status === "training" ||
-            job.status === "trained"
+            job.status === "trained" ||
+            job.status === "deployed"
           }
         >
           {job.status === "completed" || job.status === "segmenting"
             ? "Start Training"
-            : "Training..."}
+            : job.status === "deployed"
+              ? "Trained"
+              : "Training..."}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
