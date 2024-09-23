@@ -40,19 +40,40 @@ export default function ActionsDropDown({ job }: ActionsDropDownProps) {
   const [current, setCurrent] = useState(1);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const updateTrainingJob = useMutation(api.trainingJobs.updateTrainingJob);
+  const generateUploadUrl = useMutation(api.trainingJobs.generateUploadUrl);
 
   const handleTraining = async () => {
     for (let i = 0; i <= 100; i += 10) {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       await updateTrainingJob({
         _id: job._id,
-        trainingProgress: i,
+        trainingProgress: i === 100 ? 99 : i,
       });
     }
+    const trainedModelFile = "./models/isolated-bag.pt";
+    const uploadUrl = await generateUploadUrl();
+    const response = await fetch(uploadUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/octet-stream",
+      },
+      body: trainedModelFile,
+    });
+
+    if (!response.ok) {
+      toast.error("Failed to train Yolo v8 model.");
+      return;
+    }
+
+    const { storageId } = await response.json();
+
     await updateTrainingJob({
       _id: job._id,
       status: "trained",
+      trainedModelFile: storageId,
+      trainingProgress: 100,
     });
+
     toast.success("Training completed successfully.");
   };
 

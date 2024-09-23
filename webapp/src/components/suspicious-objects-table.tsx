@@ -42,10 +42,10 @@ export function SuspiciousObjectsTable() {
         const latestActivity = objects[0];
         if (
           latestActivity.status === "evaluated" &&
-          (latestActivity.aiEvaluationScore ?? 1) > 0.3 &&
+          (latestActivity.aiEvaluationScore ?? 1) > 0.7 &&
           !latestActivity.aiNotified
         ) {
-          toast.warning("Alert: AI has confirmed a suspiscious object.", {
+          toast.error("Alert: AI has confirmed a suspiscious object.", {
             description: `Score: ${latestActivity.aiEvaluationScore}\n\n Evaluation: ${latestActivity.aiEvaluation}`,
           });
           await updateActivityNotification({
@@ -54,7 +54,7 @@ export function SuspiciousObjectsTable() {
           });
         } else {
           if (!latestActivity.initialNotified) {
-            toast.info(`Alert: ${latestActivity.description}`);
+            toast.warning(`Alert: ${latestActivity.description}`);
             await updateActivityNotification({
               id: latestActivity._id,
               initialNotified: true,
