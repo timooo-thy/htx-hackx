@@ -28,6 +28,7 @@ export default defineSchema({
   activity: defineTable({
     title: v.string(),
     officerId: v.id("officers"),
+    objectClass: v.optional(v.string()),
     description: v.string(),
     location: v.string(),
     imageId: v.optional(v.string()),

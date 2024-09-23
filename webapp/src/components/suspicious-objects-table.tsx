@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -26,27 +26,28 @@ import Image from "next/image";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useDebounce } from "@/lib/hooks";
+import { toast } from "sonner";
 
 export function SuspiciousObjectsTable() {
   const objects = useQuery(api.activity.getSuspiciousActivities, {});
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-  // const handleEvaluate = async (id: string) => {
-  //   // Simulate AI evaluation
-  //   await new Promise((resolve) => setTimeout(resolve, 1000));
-  //   setObjects((prevObjects) =>
-  //     prevObjects.map((obj) =>
-  //       obj.id === id
-  //         ? {
-  //             ...obj,
-  //             status: "evaluated",
-  //             aiEvaluation: "Low risk. Further investigation recommended.",
-  //           }
-  //         : obj
-  //     )
-  //   );
-  // };
+  useEffect(() => {
+    if (objects && objects.length > 0) {
+      const latestActivity = objects[0];
+      if (
+        latestActivity.status === "evaluated" &&
+        (latestActivity.aiEvaluationScore ?? 1) > 0.3
+      ) {
+        toast.warning("Alert: AI has confirmed a suspiscious object.", {
+          description: `Score: ${latestActivity.aiEvaluationScore}\n\n Evaluation: ${latestActivity.aiEvaluation}`,
+        });
+      } else {
+        toast.info(`Alert: ${latestActivity.description}`);
+      }
+    }
+  }, [objects]);
 
   const filteredObjects =
     objects?.filter(
@@ -112,12 +113,12 @@ export function SuspiciousObjectsTable() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Reported At</TableHead>
-            <TableHead>Location</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Image</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Action</TableHead>
+            <TableHead className="text-center">Reported At</TableHead>
+            <TableHead className="text-center">Location</TableHead>
+            <TableHead className="text-center">Description</TableHead>
+            <TableHead className="text-center">Image</TableHead>
+            <TableHead className="text-center">Status</TableHead>
+            <TableHead className="text-center">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -162,9 +163,11 @@ export function SuspiciousObjectsTable() {
                     object.status.slice(1)}
                 </Badge>
               </TableCell>
-              <TableCell>
+              <TableCell className="">
                 {object.status === "pending" ? (
-                  <Button>Evaluate</Button>
+                  <Button variant="outline" disabled>
+                    View Evaluation
+                  </Button>
                 ) : (
                   <Dialog>
                     <DialogTrigger asChild>

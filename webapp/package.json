@@ -25,6 +25,7 @@
     "clsx": "^2.1.1",
     "convex": "^1.15.0",
     "embla-carousel-react": "^8.3.0",
+    "file-type": "^19.5.0",
     "lucide-react": "^0.437.0",
     "next": "14.2.7",
     "next-themes": "^0.3.0",

@@ -9,8 +9,8 @@ import { Toaster } from "@/components/ui/sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "HTX HackX",
-  description: "HTX HacX",
+  title: "HTX Sentinel",
+  description: "One stop solution for all your surveillance needs.",
 };
 
 export default function RootLayout({

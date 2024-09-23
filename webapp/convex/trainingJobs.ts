@@ -103,7 +103,6 @@ export const postTrainingJob = mutation({
 export const updateTrainingJob = mutation({
   args: {
     _id: v.id("trainingJobs"),
-    _creationTime: v.number(),
     status: v.optional(
       v.union(
         v.literal("segmenting"),
@@ -113,12 +112,10 @@ export const updateTrainingJob = mutation({
         v.literal("deployed")
       )
     ),
-    jobName: v.optional(v.string()),
     trainingProgress: v.optional(v.number()),
     segmentingProgress: v.optional(v.number()),
     maskedImageIds: v.optional(v.array(v.string())),
     trainedModelFile: v.optional(v.string()),
-    modelFile: v.optional(v.string()),
     videoIds: v.optional(v.array(v.string())),
   },
   handler: async (
@@ -130,19 +127,24 @@ export const updateTrainingJob = mutation({
       trainingProgress,
       maskedImageIds,
       trainedModelFile,
-      jobName,
       videoIds,
     }
   ) => {
-    const trainingJob = await ctx.db.patch(_id, {
-      jobName,
+    const updateFields = {
       status,
       segmentingProgress,
       trainingProgress,
       maskedImageIds,
       trainedModelFile,
       videoIds,
-    });
+    };
+
+    // Remove undefined fields
+    const filteredUpdateFields = Object.fromEntries(
+      Object.entries(updateFields).filter(([_, v]) => v !== undefined)
+    );
+
+    const trainingJob = await ctx.db.patch(_id, filteredUpdateFields);
     return trainingJob;
   },
 });
