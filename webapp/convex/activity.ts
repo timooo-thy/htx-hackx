@@ -86,6 +86,8 @@ export const postActivity = mutation({
       status,
       aiEvaluation,
       aiEvaluationScore,
+      aiNotified: false,
+      initialNotified: false,
     });
     return activity;
   },
@@ -103,5 +105,25 @@ export const updateActivity = mutation({
       aiEvaluationScore,
       status: "evaluated",
     });
+  },
+});
+
+export const updateActivityNotification = mutation({
+  args: {
+    id: v.id("activity"),
+    aiNotified: v.optional(v.boolean()),
+    initialNotified: v.optional(v.boolean()),
+  },
+  handler: async (ctx, { id, aiNotified, initialNotified }) => {
+    const notified = {
+      aiNotified,
+      initialNotified,
+    };
+
+    const filtedNotified = Object.fromEntries(
+      Object.entries(notified).filter(([_, v]) => v !== undefined)
+    );
+
+    await ctx.db.patch(id, filtedNotified);
   },
 });

@@ -95,6 +95,7 @@ export const postTrainingJob = mutation({
       videoIds,
       jobName,
       maskedImageIds: [],
+      notified: false,
     });
     return trainingJob;
   },
@@ -139,12 +140,23 @@ export const updateTrainingJob = mutation({
       videoIds,
     };
 
-    // Remove undefined fields
     const filteredUpdateFields = Object.fromEntries(
       Object.entries(updateFields).filter(([_, v]) => v !== undefined)
     );
 
     const trainingJob = await ctx.db.patch(_id, filteredUpdateFields);
     return trainingJob;
+  },
+});
+
+export const updateTrainingJobNotification = mutation({
+  args: {
+    id: v.id("trainingJobs"),
+    notified: v.boolean(),
+  },
+  handler: async (ctx, { id, notified }) => {
+    await ctx.db.patch(id, {
+      notified,
+    });
   },
 });

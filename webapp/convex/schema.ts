@@ -35,6 +35,8 @@ export default defineSchema({
     status: v.union(v.literal("pending"), v.literal("evaluated")),
     aiEvaluation: v.optional(v.string()),
     aiEvaluationScore: v.optional(v.number()),
+    aiNotified: v.boolean(),
+    initialNotified: v.boolean(),
   }),
   officers: defineTable({
     name: v.string(),
@@ -53,5 +55,6 @@ export default defineSchema({
     videoIds: v.array(v.string()),
     maskedImageIds: v.array(v.string()),
     trainedModelFile: v.optional(v.string()),
+    notified: v.boolean(),
   }),
 });

@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { DownloadIcon, SearchIcon } from "lucide-react";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useDebounce } from "@/lib/hooks";
 import { startSegmenting } from "@/actions/trainingActions";
@@ -32,17 +32,28 @@ export function YoloDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const videoFileRef = useRef<HTMLInputElement>(null);
+  const updateTrainingJobNotification = useMutation(
+    api.trainingJobs.updateTrainingJobNotification
+  );
 
   useEffect(() => {
-    if (trainingJobs && trainingJobs.length > 0) {
-      const latestJob = trainingJobs[0];
-      if (latestJob.status === "segmented") {
-        toast.success("Completed Job", {
-          description: `${latestJob.jobName} segmented successfully.`,
-        });
+    const checkNotification = async () => {
+      if (trainingJobs && trainingJobs.length > 0) {
+        const latestJob = trainingJobs[0];
+        if (latestJob.status === "segmented" && !latestJob.notified) {
+          toast.success("Completed Job", {
+            description: `${latestJob.jobName} segmented successfully.`,
+          });
+
+          await updateTrainingJobNotification({
+            id: latestJob._id,
+            notified: true,
+          });
+        }
       }
-    }
-  }, [trainingJobs]);
+    };
+    checkNotification();
+  }, [trainingJobs, updateTrainingJobNotification]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {

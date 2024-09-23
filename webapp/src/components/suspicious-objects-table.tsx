@@ -23,7 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { DownloadIcon, SearchIcon } from "lucide-react";
 import Image from "next/image";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useDebounce } from "@/lib/hooks";
 import { toast } from "sonner";
@@ -32,22 +32,39 @@ export function SuspiciousObjectsTable() {
   const objects = useQuery(api.activity.getSuspiciousActivities, {});
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const updateActivityNotification = useMutation(
+    api.activity.updateActivityNotification
+  );
 
   useEffect(() => {
-    if (objects && objects.length > 0) {
-      const latestActivity = objects[0];
-      if (
-        latestActivity.status === "evaluated" &&
-        (latestActivity.aiEvaluationScore ?? 1) > 0.3
-      ) {
-        toast.warning("Alert: AI has confirmed a suspiscious object.", {
-          description: `Score: ${latestActivity.aiEvaluationScore}\n\n Evaluation: ${latestActivity.aiEvaluation}`,
-        });
-      } else {
-        toast.info(`Alert: ${latestActivity.description}`);
+    const sendNotification = async () => {
+      if (objects && objects.length > 0) {
+        const latestActivity = objects[0];
+        if (
+          latestActivity.status === "evaluated" &&
+          (latestActivity.aiEvaluationScore ?? 1) > 0.3 &&
+          !latestActivity.aiNotified
+        ) {
+          toast.warning("Alert: AI has confirmed a suspiscious object.", {
+            description: `Score: ${latestActivity.aiEvaluationScore}\n\n Evaluation: ${latestActivity.aiEvaluation}`,
+          });
+          await updateActivityNotification({
+            id: latestActivity._id,
+            aiNotified: true,
+          });
+        } else {
+          if (!latestActivity.initialNotified) {
+            toast.info(`Alert: ${latestActivity.description}`);
+            await updateActivityNotification({
+              id: latestActivity._id,
+              initialNotified: true,
+            });
+          }
+        }
       }
-    }
-  }, [objects]);
+    };
+    sendNotification();
+  }, [objects, updateActivityNotification]);
 
   const filteredObjects =
     objects?.filter(
