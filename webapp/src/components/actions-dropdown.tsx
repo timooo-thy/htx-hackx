@@ -1,5 +1,5 @@
 import { FunctionReturnType } from "convex/server";
-import React, { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { api } from "../../convex/_generated/api";
 import {
   Carousel,
@@ -28,6 +28,8 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import Image from "next/image";
+import { useMutation } from "convex/react";
+import { toast } from "sonner";
 
 type ActionsDropDownProps = {
   job: FunctionReturnType<
@@ -37,6 +39,22 @@ type ActionsDropDownProps = {
 export default function ActionsDropDown({ job }: ActionsDropDownProps) {
   const [current, setCurrent] = useState(1);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const updateTrainingJob = useMutation(api.trainingJobs.updateTrainingJob);
+
+  const handleTraining = async () => {
+    for (let i = 0; i <= 100; i += 10) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await updateTrainingJob({
+        _id: job._id,
+        trainingProgress: i,
+      });
+    }
+    await updateTrainingJob({
+      _id: job._id,
+      status: "trained",
+    });
+    toast.success("Training completed successfully.");
+  };
 
   useEffect(() => {
     if (!carouselApi) {
@@ -106,16 +124,12 @@ export default function ActionsDropDown({ job }: ActionsDropDownProps) {
         </Dialog>
         <DropdownMenuItem
           className="text-xs h-[32px]"
-          disabled={
-            job.segmentingProgress < 100 ||
-            job.status === "training" ||
-            job.status === "trained" ||
-            job.status === "deployed"
-          }
+          disabled={job.status !== "completed"}
+          onClick={handleTraining}
         >
           {job.status === "completed" || job.status === "segmenting"
             ? "Start Training"
-            : job.status === "deployed"
+            : job.status === "deployed" || job.status === "trained"
               ? "Trained"
               : "Training..."}
         </DropdownMenuItem>

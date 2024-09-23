@@ -17,7 +17,7 @@ import { DownloadIcon, SearchIcon } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useDebounce } from "@/lib/hooks";
-import { startTraining } from "@/actions/trainingActions";
+import { startSegmenting } from "@/actions/trainingActions";
 import { toast } from "sonner";
 import TrainingFormButton from "./training-form-button";
 import ActionsDropDown from "./actions-dropdown";
@@ -33,52 +33,22 @@ export function YoloDashboard() {
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const videoFileRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    if (trainingJobs && trainingJobs.length > 0) {
+      const latestJob = trainingJobs[0];
+      if (latestJob.status === "completed") {
+        toast.success("Completed Job", {
+          description: `${latestJob.jobName} segmented successfully.`,
+        });
+      }
+    }
+  }, [trainingJobs]);
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setVideoFile(event.target.files[0]);
     }
   };
-
-  // const handleUpload = async () => {
-  //   if (!videoFile) {
-  //     toast.error("Please select a video file to upload.");
-  //     return;
-  //   }
-
-  //   // Simulate file upload and job creation
-  //   const newJob: TrainingJob = {
-  //     id: String(trainingJobs.length + 1),
-  //     name: videoFile.name,
-  //     status: "queued",
-  //     progress: 0,
-  //     createdAt: new Date().toISOString().slice(0, 16).replace("T", " "),
-  //   };
-
-  //   setTrainingJobs((prev) => [...prev, newJob]);
-  //   setVideoFile(null);
-
-  //   toast.success("Video uploaded and training job created successfully.");
-
-  //   // Simulate training progress
-  //   let progress = 0;
-  //   const intervalId = setInterval(() => {
-  //     progress += 10;
-  //     setTrainingJobs((prev) =>
-  //       prev.map((job) =>
-  //         job.id === newJob.id
-  //           ? {
-  //               ...job,
-  //               status: progress < 100 ? "training" : "completed",
-  //               progress: Math.min(progress, 100),
-  //             }
-  //           : job
-  //       )
-  //     );
-  //     if (progress >= 100) {
-  //       clearInterval(intervalId);
-  //     }
-  //   }, 2000);
-  // };
 
   const filteredJobs =
     trainingJobs?.filter((job) =>
@@ -131,7 +101,7 @@ export function YoloDashboard() {
       <form
         className="grid gap-y-4"
         action={async (formData) => {
-          const response = await startTraining(formData);
+          const response = await startSegmenting(formData);
           if (response.error) {
             toast.error(response.error);
           } else {
