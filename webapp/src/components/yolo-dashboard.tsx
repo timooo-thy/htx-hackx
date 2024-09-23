@@ -125,7 +125,7 @@ export function YoloDashboard() {
           }
         }}
       >
-        <div className="flex gap-x-4">
+        <div className="flex md:gap-x-4 flex-col md:flex-row gap-y-4">
           <div className="grid w-full max-w-sm items-center gap-1.5">
             <Label htmlFor="video-upload">Upload Suspicious Video</Label>
             <Input
@@ -158,7 +158,7 @@ export function YoloDashboard() {
         <TrainingFormButton fileSelected={!!videoFile} />
       </form>
 
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-y-5 items-start md:flex-row md:justify-between">
         <div className="relative">
           <SearchIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input

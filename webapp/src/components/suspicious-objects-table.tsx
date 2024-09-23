@@ -112,7 +112,7 @@ export function SuspiciousObjectsTable() {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-y-5 items-start md:flex-row md:justify-between">
         <div className="relative">
           <SearchIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
