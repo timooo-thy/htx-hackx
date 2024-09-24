@@ -9,6 +9,7 @@ import requests
 from dotenv import load_dotenv
 from openai import AzureOpenAI
 import json
+from collections import defaultdict
 
 def q_consumer(frame_q):
     load_dotenv(".env.local")
@@ -20,9 +21,6 @@ def q_consumer(frame_q):
     while True:
         dic = frame_q.get()
         frame, score, class_name = dic['frame'], dic['score'], dic['class']
-        cv2.imshow('frame', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
         client = ConvexClient(os.getenv("NEXT_PUBLIC_CONVEX_URL"))
         activity_id, storage_url = uploadFrame(client, frame, score, class_name)
         response_dict = verifyChatGPT(storage_url, class_name, azureOpenAIClient)
@@ -119,7 +117,7 @@ def main():
         q_consumer_thread = multiprocessing.Process(target=q_consumer, args=(uploadFrame_q,))
         q_consumer_thread.start()
 
-    model = YOLO('yolov8n.pt', verbose=False)
+    model = YOLO('yolov8n.pt')
     # model = YOLO('best.pt')
     print(model.model.names)
     target_classes = ['backpack', 'handbag', 'suitcase', 'baseball bat', 'fork', 'knife', 'scissors', 'cell phone']
@@ -127,8 +125,22 @@ def main():
     tracker = DeepSort(embedder='torchreid', max_age=6000)
     confirmed_track_ids = set()     # track_ids that have been confirmed before (but could be marked as deleted if not detected for a long time)
 
+    frame_i = 0
+    class_to_frame_i_map = dict()                       # stores the frame_i when a class is last detected
+    frame_i_to_class_map = defaultdict(lambda: [])      # inverses class_to_frame_i_map's keys and values (key: frame_i, value: arr of class_name)
     while True:
+        # update class_to_frame_i_map and frame_i_to_class_map
+        # remove classes that were detected more than 100 frames ago
+        frame_i_to_class_map_keys = list(frame_i_to_class_map.keys())
+        for frame_i_key in frame_i_to_class_map_keys:
+            if frame_i_key < frame_i - 100:
+                class_arr = frame_i_to_class_map.pop(frame_i_key)
+                for class_name in class_arr:
+                    if class_to_frame_i_map[class_name] == frame_i_key:
+                        class_to_frame_i_map.pop(class_name)
+                        
         ret, frame = cap.read()
+        frame_i += 1
         if not ret:
             break
         results = model(frame, stream=True)
@@ -180,11 +192,11 @@ def main():
         
         tracker.tracks = new_tracks
 
-        print([(track.track_id, track.is_confirmed()) for track in tracks])
-        print(unmatched_track_idxs)
-        print([track.track_id for track in detected_tracks])
-        print([track.track_id for track in just_exited_tracks])
-        print([track.track_id for track in new_tracks])
+        # print([(track.track_id, track.is_confirmed()) for track in tracks])
+        # print(unmatched_track_idxs)
+        print('Currently detected tracks:', [track.track_id for track in detected_tracks])
+        print('Just exited tracks (within past 5 frames:', [track.track_id for track in just_exited_tracks])
+        print('Tracks that are remembered:', [track.track_id for track in new_tracks])
         
         # use detected_tracks and just_exited tracks for demo, to show a more consistent track over time
         # in reality, only draw bounding boxes and send to backend for detected_tracks
@@ -202,8 +214,13 @@ def main():
         #     cv2.putText(frame, f'ID: {track_id}, Conf: {track.det_conf}, Class: {track.det_class}', (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
         #     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
         
+        # by right we should also include tracks that have long exited and we are sure we can trigger an upload to the db for this
         for track in detected_newly_confirmed_tracks:
             if track.det_class not in target_classes:
+                continue
+            # if class was detected within the last 100 frames, ignore
+            elif track.det_class in class_to_frame_i_map and frame_i - class_to_frame_i_map[track.det_class] <= 100:
+                print(f'Seen the same class "{track.det_class}" within the last 100 frames, skipping')
                 continue
             track_id = track.track_id
             ltrb = track.to_ltrb()
@@ -217,6 +234,12 @@ def main():
             if uploadFrame_q.full():
                 uploadFrame_q.get()
             uploadFrame_q.put({ 'frame': frame_copy, 'score': track.det_conf, 'class': track.det_class })
+            class_to_frame_i_map[track.det_class] = frame_i
+            frame_i_to_class_map[frame_i].append(track.det_class)
+
+            cv2.imshow('frame', frame_copy)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
 
         # if detected_newly_confirmed_tracks:
         #     cv2.imshow('frame', frame)
