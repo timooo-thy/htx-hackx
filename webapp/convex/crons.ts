@@ -5,7 +5,7 @@ const crons = cronJobs();
 
 crons.interval(
   "update training progress",
-  { minutes: 1 },
+  { seconds: 20 },
   internal.trainingJobs.updateTrainingJobProgress
 );
 

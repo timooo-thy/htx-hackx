@@ -48,6 +48,7 @@ export default function ActionsDropDown({ job }: ActionsDropDownProps) {
       await updateTrainingJob({
         _id: job._id,
         trainingProgress: i === 100 ? 99 : i,
+        status: "training",
       });
     }
     const trainedModelFile = "./models/isolated-bag.pt";
