@@ -1,0 +1,11 @@
+autodistill
+autodistill-grounded-sam-2
+autodistill-yolov8
+autodistill
+convex===0.6.0
+python-dotenv===1.0.1
+roboflow
+supervision==0.9.0
+urllib3==1.26.16
+llama-index-core==0.10.40
+typing-extensions==4.11.0

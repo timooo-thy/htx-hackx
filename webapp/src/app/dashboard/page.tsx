@@ -1,16 +1,14 @@
-import { auth } from "@clerk/nextjs/server";
+import { checkRole } from "@/actions/utils";
+import { MainDashboard } from "@/components/main-dashboard";
+import { currentUser } from "@clerk/nextjs/server";
 
-export default function Dashboard() {
-  const { userId } = auth();
+export default async function Dashboard() {
+  const isAdmin = checkRole("admin");
+  const user = await currentUser();
+
   return (
-    <main className="flex flex-col items-center min-h-dvh">
-      <div className="flex flex-col justify-center border h-40 w-full pl-4">
-        <p>Hello {userId}!</p>
-        <p>
-          You are currently viewing the dashboard page. This page is only
-          accessible to authenticated users.
-        </p>
-      </div>
+    <main className="w-5/6 m-auto pb-8 min-h-[calc(100vh-144px)]">
+      <MainDashboard userName={user?.firstName ?? ""} isAdmin={isAdmin} />
     </main>
   );
 }
