@@ -26,7 +26,7 @@ export default function AnimatedCircularProgressBarDemo() {
       value={value}
       gaugePrimaryColor="rgb(59 130 246)"
       gaugeSecondaryColor="rgba(0, 0, 0, 0.1)"
-      className="h-12 w-12 text-xs"
+      className="h-12 w-12 text-xs dark:text-background"
     />
   );
 }

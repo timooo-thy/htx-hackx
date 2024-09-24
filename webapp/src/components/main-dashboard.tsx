@@ -45,7 +45,7 @@ export function MainDashboard({ userName, isAdmin }: MainDashboardProps) {
           {userName}&apos;s Dashboard
         </h2>
       </div>
-      <Tabs defaultValue="overview" className="space-y-8 md:space-y-4 ">
+      <Tabs defaultValue="overview" className="space-y-8 md:space-y-4">
         <TabsList className="grid grid-cols-2 md:grid-cols-4 h-18 md:h-9">
           <TabsTrigger
             value="overview"
