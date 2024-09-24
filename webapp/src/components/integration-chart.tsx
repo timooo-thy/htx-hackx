@@ -35,30 +35,30 @@ export default function IntegrationChart() {
 
   return (
     <div
-      className="relative flex h-[350px] w-full items-center justify-center overflow-hidden rounded-lg border bg-background p-10 md:shadow-xl"
+      className="relative flex h-[350px] w-full items-center justify-center overflow-hidden rounded-lg border p-10 md:shadow-xl dark:bg-white"
       ref={containerRef}
     >
       <div className="flex size-full flex-col max-w-lg max-h-[200px] items-stretch justify-between">
         <div className="flex flex-row items-center justify-between">
-          <Circle ref={div1Ref} className="size-16">
+          <Circle ref={div1Ref} className="size-16 dark:border-none">
             <Camera className="text-blue-500" />
           </Circle>
-          <Circle ref={div5Ref} className="size-16">
+          <Circle ref={div5Ref} className="size-16 dark:border-none">
             <Brain className="text-blue-500" />
           </Circle>
         </div>
         <div className="flex flex-row items-center justify-between">
           <div />
-          <Circle ref={div4Ref} className="size-24">
+          <Circle ref={div4Ref} className="size-24 dark:border-none">
             <Shield className="text-blue-500 h-10 w-10" />
           </Circle>
           <div />
         </div>
         <div className="flex flex-row items-center justify-between">
-          <Circle ref={div3Ref} className="size-16">
+          <Circle ref={div3Ref} className="size-16 dark:border-none">
             <Bell className="text-blue-500" />
           </Circle>
-          <Circle ref={div7Ref} className="size-16">
+          <Circle ref={div7Ref} className="size-16 dark:border-none">
             <Map className="text-blue-500" />
           </Circle>
         </div>

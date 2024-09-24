@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
 
 export const getAllTrainingJobs = query({
@@ -41,11 +41,10 @@ export const getAllTrainingJobsWithWeights = query({
     const trainingJobs = await ctx.db
       .query("trainingJobs")
       .filter((q) =>
-        q.not(
-          q.or(
-            q.eq(q.field("status"), "segmenting"),
-            q.eq(q.field("status"), "segmented")
-          )
+        q.or(
+          q.eq(q.field("status"), "trained"),
+          q.eq(q.field("status"), "deployed"),
+          q.eq(q.field("status"), "training")
         )
       )
       .order("desc")
@@ -53,6 +52,9 @@ export const getAllTrainingJobsWithWeights = query({
 
     const trainingJobsWithWeights = await Promise.all(
       trainingJobs.map(async (trainingJob) => {
+        if (!trainingJob.trainedModelFile) {
+          return { ...trainingJob, modelFile: "" };
+        }
         const modelFile = await ctx.storage.getUrl(
           trainingJob.trainedModelFile as Id<"_storage">
         );
@@ -158,5 +160,30 @@ export const updateTrainingJobNotification = mutation({
     await ctx.db.patch(id, {
       notified,
     });
+  },
+});
+
+export const updateTrainingJobProgress = internalMutation({
+  args: {},
+  handler: async (ctx, {}) => {
+    const job = await ctx.db
+      .query("trainingJobs")
+      .filter((q) =>
+        q.eq(
+          q.field("_id"),
+          "jn7exkvm7vyk50eerc25fcqe6h70j692" as Id<"trainingJobs">
+        )
+      )
+      .collect()
+      .then((jobs) => jobs[0]);
+
+    await ctx.db.patch(
+      "jn7exkvm7vyk50eerc25fcqe6h70j692" as Id<"trainingJobs">,
+      {
+        trainingProgress:
+          job.trainingProgress === 100 ? 0 : job.trainingProgress + 1,
+        status: job.trainingProgress + 1 === 100 ? "trained" : "training",
+      }
+    );
   },
 });

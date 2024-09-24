@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { BarChart2, Bell, Brain, Camera, Cog, Map, Shield } from "lucide-react";
+import { BarChart2, Bell, Camera, Cog, Map, Shield } from "lucide-react";
 import { BorderBeam } from "@/components/magicui/border-beam";
 import Link from "next/link";
 import ShineBorder from "@/components/magicui/shine-border";
@@ -14,12 +14,12 @@ import IntegrationChart from "@/components/integration-chart";
 export default function LandingPage() {
   return (
     <main className="min-h-screen flex justify-center flex-col relative">
-      <section className="w-full py-12 md:py-24 lg:py-32 xl:py-40 bg-gray-900 text-white rounded-2xl shadow-xl border">
+      <section className="w-full py-12 md:py-24 lg:py-32 xl:py-40 bg-gray-900 rounded-2xl shadow-xl border">
         <div className="container px-4 md:px-6 m-auto">
           <div className="flex flex-col items-center space-y-4 text-center">
             <div className="space-y-2 relative w-auto p-8 rounded-2xl">
               <BorderBeam duration={10} />
-              <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
+              <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none text-white">
                 HTX Sentinel: AI-Powered Policing
               </h1>
               <p className="mx-auto max-w-[700px] text-gray-400 md:text-xl">
@@ -44,15 +44,18 @@ export default function LandingPage() {
             "inset-x-0 h-[150%] skew-y-12 inset-y-[-200px]"
           )}
         />
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 rounded-2xl shadow-xl border">
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 rounded-2xl shadow-xl border dark:bg-black">
           <div className="container px-4 md:px-6 m-auto">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-center mb-12">
               Key Features
             </h2>
             <div className="grid gap-6 lg:grid-cols-3 lg:gap-12">
-              <ShineBorder className="flex flex-col items-center space-y-4 text-center p-6">
+              <ShineBorder
+                className="flex flex-col items-center space-y-4 text-center p-6 dark:bg-white"
+                color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
+              >
                 <Camera className="h-12 w-12 text-blue-500" />
-                <h3 className="text-2xl font-bold">
+                <h3 className="text-2xl font-bold dark:text-background">
                   Advanced Object Detection
                 </h3>
                 <p className="text-gray-500">
@@ -61,9 +64,12 @@ export default function LandingPage() {
                   analysis using advanced vision models.
                 </p>
               </ShineBorder>
-              <ShineBorder className="flex flex-col items-center space-y-4 text-center p-6">
+              <ShineBorder
+                className="flex flex-col items-center space-y-4 text-center p-6 dark:bg-white"
+                color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
+              >
                 <Bell className="h-12 w-12 text-blue-500" />
-                <h3 className="text-2xl font-bold">
+                <h3 className="text-2xl font-bold dark:text-background">
                   Intelligent Notifications
                 </h3>
                 <p className="text-gray-500">
@@ -72,9 +78,14 @@ export default function LandingPage() {
                   models.
                 </p>
               </ShineBorder>
-              <ShineBorder className="flex flex-col items-center space-y-4 text-center p-6">
+              <ShineBorder
+                className="flex flex-col items-center space-y-4 text-center p-6 dark:bg-white"
+                color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
+              >
                 <Map className="h-12 w-12 text-blue-500" />
-                <h3 className="text-2xl font-bold">Patrol Optimisation</h3>
+                <h3 className="text-2xl font-bold dark:text-background">
+                  Patrol Optimisation
+                </h3>
                 <p className="text-gray-500">
                   Enhance safety and efficiency with AI-driven patrol mapping
                   and real-time officer location tracking.
@@ -83,7 +94,7 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
-        <section className="w-full py-12 md:py-24 lg:py-32 rounded-2xl shadow-xl border ">
+        <section className="w-full py-12 md:py-24 lg:py-32 rounded-2xl shadow-xl border">
           <div className="container px-4 md:px-6 m-auto">
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
               <div className="space-y-4">
@@ -98,28 +109,32 @@ export default function LandingPage() {
               </div>
               <div className="flex flex-col gap-4">
                 <ShineBorder
-                  className="flex items-center space-x-4 p-4 w-full h-28"
+                  className="flex items-center space-x-4 p-4 w-full h-28 dark:bg-white"
                   color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
                 >
                   <Badge className="bg-yellow-500 w-32 flex justify-center items-center">
                     YOLO v8
                   </Badge>
                   <div className="space-y-1">
-                    <h3 className="font-bold">Real-time Object Detection</h3>
+                    <h3 className="font-bold dark:text-background">
+                      Real-time Object Detection
+                    </h3>
                     <p className="text-sm text-gray-500">
                       Fast and accurate detection of suspicious objects
                     </p>
                   </div>
                 </ShineBorder>
                 <ShineBorder
-                  className="flex items-center space-x-4 p-4 w-full h-28"
+                  className="flex items-center space-x-4 p-4 w-full h-28 dark:bg-white"
                   color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
                 >
                   <Badge className="bg-green-500 w-32 flex justify-center items-center">
                     GPT-4o-mini
                   </Badge>
                   <div className="space-y-1">
-                    <h3 className="font-bold">Contextual Analysis</h3>
+                    <h3 className="font-bold dark:text-background">
+                      Contextual Analysis
+                    </h3>
                     <p className="text-sm text-gray-500">
                       Advanced image understanding for accurate threat
                       assessment
@@ -127,14 +142,16 @@ export default function LandingPage() {
                   </div>
                 </ShineBorder>
                 <ShineBorder
-                  className="flex items-center space-x-4 p-4 w-full h-28"
+                  className="flex items-center space-x-4 p-4 w-full h-28 dark:bg-white"
                   color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
                 >
                   <Badge className="bg-blue-500 w-32 flex justify-center items-center">
                     Florence & SAM2
                   </Badge>
                   <div className="space-y-1">
-                    <h3 className="font-bold">Image Segmentation</h3>
+                    <h3 className="font-bold dark:text-background">
+                      Image Segmentation
+                    </h3>
                     <p className="text-sm text-gray-500">
                       Precise segmentation for detailed analysis and training
                     </p>
@@ -154,13 +171,15 @@ export default function LandingPage() {
           flickerChance={0.1}
         />
         <div className="container px-4 md:px-6 m-auto">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-center mb-12">
+          <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-center mb-12 dark:text-black">
             Comprehensive Admin Capabilities
           </h2>
           <div className="grid gap-6 lg:grid-cols-3 lg:gap-12">
             <div className="flex flex-col items-center space-y-4 text-center">
               <AnimmatedCircularProgressBarDemo />
-              <h3 className="text-2xl font-bold">AI Model Training</h3>
+              <h3 className="text-2xl font-bold dark:text-black">
+                AI Model Training
+              </h3>
               <p className="text-gray-500">
                 Train custom YOLO v8 models using segmented images from your
                 department&apos;s data
@@ -168,14 +187,18 @@ export default function LandingPage() {
             </div>
             <div className="flex flex-col items-center space-y-4 text-center">
               <Cog className="h-12 w-12 text-blue-500" />
-              <h3 className="text-2xl font-bold">Model Deployment</h3>
+              <h3 className="text-2xl font-bold dark:text-black">
+                Model Deployment
+              </h3>
               <p className="text-gray-500">
                 Easily deploy trained models across your entire police force
               </p>
             </div>
             <div className="flex flex-col items-center space-y-4 text-center">
               <BarChart2 className="h-12 w-12 text-blue-500" />
-              <h3 className="text-2xl font-bold">Analytics Dashboard</h3>
+              <h3 className="text-2xl font-bold dark:text-black">
+                Analytics Dashboard
+              </h3>
               <p className="text-gray-500">
                 Comprehensive analytics and reporting for data-driven decision
                 making
@@ -184,7 +207,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      <section className="w-full py-12 md:py-24 lg:py-32 rounded-2xl shadow-xl border">
+      <section className="w-full py-12 md:py-24 lg:py-32 rounded-2xl shadow-xl border dark:bg-gray-950">
         <div className="container px-4 md:px-6 m-auto">
           <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
             <div className="space-y-4">
@@ -220,11 +243,11 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-900 text-white rounded-2xl shadow-xl border">
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-900 rounded-2xl shadow-xl border">
         <div className="container px-4 md:px-6 m-auto">
           <div className="flex flex-col items-center gap-y-10 text-center">
             <div className="flex flex-col gap-y-4">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-white">
                 Revolutionise SPF with HTX Sentinel
               </h2>
               <p className="mx-auto max-w-[600px] text-gray-400 md:text-xl">

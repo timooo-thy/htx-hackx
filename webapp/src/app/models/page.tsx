@@ -24,8 +24,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { DialogClose } from "@radix-ui/react-dialog";
 
 export default function ModelsPage() {
@@ -107,7 +105,9 @@ export default function ModelsPage() {
                   <FileText className="mr-2 h-4 w-4" />
                   <span className="text-sm text-muted-foreground">
                     Weights:{" "}
-                    {job.trainedModelFile + ".pt" || "Training in Progress..."}
+                    {job.trainedModelFile
+                      ? job.trainedModelFile + ".pt"
+                      : "Training in Progress..."}
                   </span>
                 </div>
                 <div className="flex items-center">
