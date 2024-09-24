@@ -45,7 +45,7 @@ export function SuspiciousObjectsTable() {
           (latestActivity.aiEvaluationScore ?? 1) > 0.7 &&
           !latestActivity.aiNotified
         ) {
-          toast.error("Alert: AI has confirmed a suspiscious object.", {
+          toast.error("Alert: AI has confirmed a suspicious object.", {
             description: `Score: ${latestActivity.aiEvaluationScore}\n\n Evaluation: ${latestActivity.aiEvaluation}`,
           });
           await updateActivityNotification({
@@ -174,7 +174,7 @@ export function SuspiciousObjectsTable() {
               </TableCell>
               <TableCell>
                 <Badge
-                  className={`${object.status === "evaluated" ? "bg-green-600" : "bg-red-600"}  text-white w-full flex justify-center items-center`}
+                  className={`${object.status === "evaluated" ? "bg-green-600 hover:bg-green-600/70" : "bg-red-600 hover:bg-red-600/70"}  text-white w-full flex justify-center items-center`}
                 >
                   {object.status.charAt(0).toUpperCase() +
                     object.status.slice(1)}
