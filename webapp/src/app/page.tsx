@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { BarChart2, Bell, Brain, Camera, Cog, Map, Shield } from "lucide-react";
+import { BarChart2, Bell, Camera, Cog, Map, Shield } from "lucide-react";
 import { BorderBeam } from "@/components/magicui/border-beam";
 import Link from "next/link";
 import ShineBorder from "@/components/magicui/shine-border";
@@ -19,7 +19,7 @@ export default function LandingPage() {
           <div className="flex flex-col items-center space-y-4 text-center">
             <div className="space-y-2 relative w-auto p-8 rounded-2xl">
               <BorderBeam duration={10} />
-              <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none text-background">
+              <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none text-white">
                 HTX Sentinel: AI-Powered Policing
               </h1>
               <p className="mx-auto max-w-[700px] text-gray-400 md:text-xl">
@@ -207,7 +207,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      <section className="w-full py-12 md:py-24 lg:py-32 rounded-2xl shadow-xl border">
+      <section className="w-full py-12 md:py-24 lg:py-32 rounded-2xl shadow-xl border dark:bg-gray-950">
         <div className="container px-4 md:px-6 m-auto">
           <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
             <div className="space-y-4">
@@ -247,7 +247,7 @@ export default function LandingPage() {
         <div className="container px-4 md:px-6 m-auto">
           <div className="flex flex-col items-center gap-y-10 text-center">
             <div className="flex flex-col gap-y-4">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-background">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-white">
                 Revolutionise SPF with HTX Sentinel
               </h2>
               <p className="mx-auto max-w-[600px] text-gray-400 md:text-xl">
