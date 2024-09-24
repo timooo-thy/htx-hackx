@@ -43,7 +43,8 @@ export async function startSegmenting(form: FormData) {
 
       const directoryPath = path.join(
         process.cwd(),
-        "/public/segmented_images"
+        "public",
+        "segmented_images"
       );
 
       const files = fs.readdirSync(directoryPath);
