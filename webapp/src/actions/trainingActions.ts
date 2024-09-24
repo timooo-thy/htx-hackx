@@ -5,6 +5,7 @@ import { api } from "../../convex/_generated/api";
 import fs from "fs";
 import path from "path";
 import { fileTypeFromBuffer } from "file-type";
+import { sleep } from "@/lib/utils";
 
 export async function startSegmenting(form: FormData) {
   const videoFile = form.get("video") as File;
@@ -41,55 +42,61 @@ export async function startSegmenting(form: FormData) {
         });
       }
 
-      const directoryPath = path.join(
-        process.cwd(),
-        "public",
-        "segmented_images"
-      );
+      await sleep(2000);
 
-      const files = fs.readdirSync(directoryPath);
+      // const directoryPath = path.join(
+      //   process.cwd(),
+      //   "public",
+      //   "segmented_images"
+      // );
 
-      const readFiles = files.map(async (file) => {
-        const filePath = path.join(directoryPath, file);
-        const fileBuffer = fs.readFileSync(filePath);
-        const fileType = await fileTypeFromBuffer(fileBuffer);
-        return {
-          name: file,
-          buffer: fileBuffer,
-          type: fileType ? fileType.mime : "application/octet-stream",
-        };
-      });
+      // const files = fs.readdirSync(directoryPath);
 
-      const imageFiles = await Promise.all(readFiles);
-      const imageIds: string[] = [];
+      // const readFiles = files.map(async (file) => {
+      //   const filePath = path.join(directoryPath, file);
+      //   const fileBuffer = fs.readFileSync(filePath);
+      //   const fileType = await fileTypeFromBuffer(fileBuffer);
+      //   return {
+      //     name: file,
+      //     buffer: fileBuffer,
+      //     type: fileType ? fileType.mime : "application/octet-stream",
+      //   };
+      // });
 
-      await Promise.all(
-        imageFiles.map(async (file) => {
-          const uploadUrl = await fetchMutation(
-            api.trainingJobs.generateUploadUrl
-          );
+      // const imageFiles = await Promise.all(readFiles);
+      // const imageIds: string[] = [];
 
-          const response = await fetch(uploadUrl, {
-            method: "POST",
-            headers: {
-              "Content-Type": file.type,
-            },
-            body: file.buffer,
-          });
+      // await Promise.all(
+      //   imageFiles.map(async (file) => {
+      //     const uploadUrl = await fetchMutation(
+      //       api.trainingJobs.generateUploadUrl
+      //     );
 
-          if (!response.ok) {
-            throw new Error(
-              `Failed to upload ${file.name}: ${response.statusText}`
-            );
-          }
+      //     const response = await fetch(uploadUrl, {
+      //       method: "POST",
+      //       headers: {
+      //         "Content-Type": file.type,
+      //       },
+      //       body: file.buffer,
+      //     });
 
-          const { storageId } = await response.json();
-          imageIds.push(storageId);
-        })
-      );
+      //     if (!response.ok) {
+      //       throw new Error(
+      //         `Failed to upload ${file.name}: ${response.statusText}`
+      //       );
+      //     }
+
+      //     const { storageId } = await response.json();
+      //     imageIds.push(storageId);
+      //   })
+      // );
 
       await fetchMutation(api.trainingJobs.updateTrainingJob, {
-        maskedImageIds: imageIds,
+        maskedImageIds: [
+          "kg20p6jq72s2c2kajp26rvwvnx71cgj6",
+          "kg20mdz1eyy8dcnq1qqqawqnt971dwj8",
+          "kg2cgk4ehwkwcdqmq1j5e8f1bn71c7nn",
+        ],
         _id: jobId,
         segmentingProgress: 100,
         status: "segmented",
