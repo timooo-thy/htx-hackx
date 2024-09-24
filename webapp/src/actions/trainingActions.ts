@@ -41,7 +41,10 @@ export async function startSegmenting(form: FormData) {
         });
       }
 
-      const directoryPath = "./public/segmented_images";
+      const directoryPath = path.join(
+        process.cwd(),
+        "/public/segmented_images"
+      );
 
       const files = fs.readdirSync(directoryPath);
 
