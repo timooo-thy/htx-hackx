@@ -42,7 +42,7 @@ export default defineSchema({
   }).vectorIndex("by_embedding", {
     vectorField: "embeddings",
     dimensions: 1536,
-    filterFields: ["title", "objectClass"],
+    filterFields: ["aiEvaluationScore", "objectClass"],
   }),
   officers: defineTable({
     name: v.string(),

@@ -37,7 +37,7 @@ export const getActivityById = internalQuery({
   },
 });
 
-export const getActivitiesByIds = internalQuery({
+export const getActivitiesDetailsByIds = internalQuery({
   args: {
     ids: v.array(v.id("activity")),
   },
@@ -49,7 +49,18 @@ export const getActivitiesByIds = internalQuery({
       if (activity === null) {
         continue;
       }
-      results.push(activity);
+
+      const imageUrl = await ctx.storage.getUrl(
+        activity.imageId as Id<"_storage">
+      );
+
+      const activityDetails = {
+        imageUrl,
+        aiEvaluation: activity.aiEvaluation,
+        aiEvaluationScore: activity.aiEvaluationScore,
+      };
+
+      results.push(activityDetails);
     }
 
     return results;
@@ -189,7 +200,7 @@ export const createEmbeddings = action({
     }
 
     const { text } = await generateText({
-      model: openai("gpt-4o"),
+      model: openai("gpt-4o-mini"),
       messages: [
         {
           role: "user",
@@ -267,7 +278,7 @@ export const getSimilarActivities = action({
     }
 
     const { text } = await generateText({
-      model: openai("gpt-4o"),
+      model: openai("gpt-4o-mini"),
       messages: [
         {
           role: "user",
@@ -306,12 +317,13 @@ export const getSimilarActivities = action({
       _score: number;
     }[] = results.filter((result) => result._score > 0.5);
 
-    const activities: Array<Doc<"activity">> = await ctx.runQuery(
-      internal.activity.getActivitiesByIds,
-      {
-        ids: filteredResults.map((result) => result._id),
-      }
-    );
+    const activities: {
+      imageUrl: string | null;
+      aiEvaluation: string | undefined;
+      aiEvaluationScore: number | undefined;
+    }[] = await ctx.runQuery(internal.activity.getActivitiesDetailsByIds, {
+      ids: filteredResults.map((result) => result._id),
+    });
 
     return activities;
   },
