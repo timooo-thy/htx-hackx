@@ -1,6 +1,7 @@
 import { checkRole } from "@/actions/utils";
 import { MainDashboard } from "@/components/main-dashboard";
 import { currentUser } from "@clerk/nextjs/server";
+export const maxDuration = 30;
 
 export default async function Dashboard() {
   const isAdmin = checkRole("admin");
