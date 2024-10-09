@@ -1,5 +1,4 @@
 "use server";
-
 import { fetchMutation } from "convex/nextjs";
 import { api } from "../../convex/_generated/api";
 import fs from "fs";
@@ -7,6 +6,8 @@ import path from "path";
 import { fileTypeFromBuffer } from "file-type";
 import { sleep } from "@/lib/utils";
 import { waitUntil } from "@vercel/functions";
+
+export const maxDuration = 30;
 
 export async function startSegmenting(form: FormData) {
   const videoFile = form.get("video") as File;
