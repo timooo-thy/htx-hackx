@@ -1,6 +1,16 @@
 import { v } from "convex/values";
-import { Id } from "./_generated/dataModel";
-import { mutation, query } from "./_generated/server";
+import { Doc, Id } from "./_generated/dataModel";
+import {
+  action,
+  internalMutation,
+  internalQuery,
+  mutation,
+  query,
+} from "./_generated/server";
+import { api, internal } from "./_generated/api";
+import { embed } from "ai";
+import { openai } from "@ai-sdk/openai";
+import { generateText } from "ai";
 
 export const getAllActivities = query({
   args: {},
@@ -14,6 +24,35 @@ export const getAllActivities = query({
     );
 
     return activitiesWithOfficerNames;
+  },
+});
+
+export const getActivityById = internalQuery({
+  args: {
+    id: v.id("activity"),
+  },
+  handler: async (ctx, { id }) => {
+    const activity = await ctx.db.get(id);
+    return activity;
+  },
+});
+
+export const getActivitiesByIds = internalQuery({
+  args: {
+    ids: v.array(v.id("activity")),
+  },
+  handler: async (ctx, { ids }) => {
+    const results = [];
+
+    for (const activityId of ids) {
+      const activity = await ctx.db.get(activityId);
+      if (activity === null) {
+        continue;
+      }
+      results.push(activity);
+    }
+
+    return results;
   },
 });
 
@@ -88,6 +127,7 @@ export const postActivity = mutation({
       aiEvaluationScore,
       aiNotified: false,
       initialNotified: false,
+      embeddings: [],
     });
     return activity;
   },
@@ -108,6 +148,83 @@ export const updateActivity = mutation({
   },
 });
 
+export const updateActivityEmbeddings = internalMutation({
+  args: {
+    id: v.id("activity"),
+    embeddings: v.array(v.float64()),
+    imageDescription: v.string(),
+  },
+  handler: async (ctx, { id, embeddings, imageDescription }) => {
+    await ctx.db.patch(id, {
+      embeddings,
+      imageDescription,
+    });
+  },
+});
+
+export const createEmbeddings = action({
+  args: {
+    id: v.id("activity"),
+  },
+  handler: async (ctx, { id }) => {
+    const activity = await ctx.runQuery(internal.activity.getActivityById, {
+      id,
+    });
+
+    if (
+      !activity ||
+      !activity.imageId ||
+      !activity.aiEvaluation ||
+      (activity.aiEvaluationScore && activity.aiEvaluationScore < 0.7)
+    ) {
+      return;
+    }
+
+    const imageUrl = await ctx.runQuery(api.activity.getImageStorageUrl, {
+      imageId: activity.imageId as Id<"_storage">,
+    });
+
+    if (!imageUrl) {
+      return;
+    }
+
+    const { text } = await generateText({
+      model: openai("gpt-4o"),
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text:
+                "This is an image of a " +
+                activity.objectClass +
+                " in " +
+                activity.location +
+                "Describe the image succinctly for use as a vector embedding for RAG.",
+            },
+            {
+              type: "image",
+              image: imageUrl,
+            },
+          ],
+        },
+      ],
+    });
+
+    const { embedding } = await embed({
+      model: openai.embedding("text-embedding-3-small"),
+      value: text,
+    });
+
+    await ctx.runMutation(internal.activity.updateActivityEmbeddings, {
+      id,
+      embeddings: embedding,
+      imageDescription: text,
+    });
+  },
+});
+
 export const updateActivityNotification = mutation({
   args: {
     id: v.id("activity"),
@@ -120,10 +237,82 @@ export const updateActivityNotification = mutation({
       initialNotified,
     };
 
-    const filtedNotified = Object.fromEntries(
+    const filteredNotified = Object.fromEntries(
       Object.entries(notified).filter(([_, v]) => v !== undefined)
     );
 
-    await ctx.db.patch(id, filtedNotified);
+    await ctx.db.patch(id, filteredNotified);
+  },
+});
+
+export const getSimilarActivities = action({
+  args: {
+    id: v.id("activity"),
+  },
+  handler: async (ctx, { id }) => {
+    const activity = await ctx.runQuery(internal.activity.getActivityById, {
+      id,
+    });
+
+    if (!activity || !activity.imageId) {
+      return;
+    }
+
+    const imageUrl = await ctx.runQuery(api.activity.getImageStorageUrl, {
+      imageId: activity.imageId as Id<"_storage">,
+    });
+
+    if (!imageUrl) {
+      return;
+    }
+
+    const { text } = await generateText({
+      model: openai("gpt-4o"),
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text:
+                "This is an image of a " +
+                activity.objectClass +
+                " in " +
+                activity.location +
+                "Generate a short search query to conduct similarity search in a vector database.",
+            },
+            {
+              type: "image",
+              image: imageUrl,
+            },
+          ],
+        },
+      ],
+    });
+
+    const { embedding } = await embed({
+      model: openai.embedding("text-embedding-3-small"),
+      value: text,
+    });
+
+    const results = await ctx.vectorSearch("activity", "by_embedding", {
+      vector: embedding,
+      limit: 3,
+      filter: (q) => q.eq("objectClass", activity.objectClass),
+    });
+
+    const filteredResults: {
+      _id: Id<"activity">;
+      _score: number;
+    }[] = results.filter((result) => result._score > 0.5);
+
+    const activities: Array<Doc<"activity">> = await ctx.runQuery(
+      internal.activity.getActivitiesByIds,
+      {
+        ids: filteredResults.map((result) => result._id),
+      }
+    );
+
+    return activities;
   },
 });
