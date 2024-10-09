@@ -59,9 +59,9 @@ export default function LandingPage() {
                   Advanced Object Detection
                 </h3>
                 <p className="text-gray-500">
-                  Utilise YOLO v8 for instant suspicious object detection
-                  through officers&apos; body cameras, with additional context
-                  analysis using advanced vision models.
+                  Fine-tuned model capable of real-time detection via
+                  officers&apos; body cameras + Retrieval Augmented Generation
+                  to enhance context awareness
                 </p>
               </ShineBorder>
               <ShineBorder
@@ -70,12 +70,12 @@ export default function LandingPage() {
               >
                 <Bell className="h-12 w-12 text-blue-500" />
                 <h3 className="text-2xl font-bold dark:text-background">
-                  Intelligent Notifications
+                  Real-Time Notifications
                 </h3>
                 <p className="text-gray-500">
-                  Receive context-aware alerts on your devices when suspicious
-                  objects are detected and verified by our advanced vision
-                  models.
+                  Receive context-aware alerts on your devices in real-time when
+                  suspicious objects are detected and verified by our advanced
+                  vision models.
                 </p>
               </ShineBorder>
               <ShineBorder
@@ -84,11 +84,11 @@ export default function LandingPage() {
               >
                 <Map className="h-12 w-12 text-blue-500" />
                 <h3 className="text-2xl font-bold dark:text-background">
-                  Patrol Optimisation
+                  Automated Training Pipeline
                 </h3>
                 <p className="text-gray-500">
-                  Enhance safety and efficiency with AI-driven patrol mapping
-                  and real-time officer location tracking.
+                  Automated segmenting of objects from video, labelling of data,
+                  training of models and deployment
                 </p>
               </ShineBorder>
             </div>

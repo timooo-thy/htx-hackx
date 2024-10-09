@@ -37,6 +37,12 @@ export default defineSchema({
     aiEvaluationScore: v.optional(v.number()),
     aiNotified: v.boolean(),
     initialNotified: v.boolean(),
+    embeddings: v.array(v.float64()),
+    imageDescription: v.optional(v.string()),
+  }).vectorIndex("by_embedding", {
+    vectorField: "embeddings",
+    dimensions: 1536,
+    filterFields: ["aiEvaluationScore", "objectClass"],
   }),
   officers: defineTable({
     name: v.string(),
