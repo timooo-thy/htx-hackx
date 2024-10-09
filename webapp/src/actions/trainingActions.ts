@@ -6,6 +6,7 @@ import fs from "fs";
 import path from "path";
 import { fileTypeFromBuffer } from "file-type";
 import { sleep } from "@/lib/utils";
+import { waitUntil } from "@vercel/functions";
 
 export async function startSegmenting(form: FormData) {
   const videoFile = form.get("video") as File;
@@ -103,7 +104,7 @@ export async function startSegmenting(form: FormData) {
       });
     };
 
-    updateProgress();
+    waitUntil(updateProgress());
     return { success: true };
   } catch (error) {
     return { error: "Failed to upload video" };
