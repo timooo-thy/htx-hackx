@@ -21,7 +21,7 @@ VIDEO_DIR_PATH = "videos"
 IMAGE_DIR_PATH = "images"
 DATASET_DIR_PATH = "dataset"
 FRAME_STRIDE = 10
-CONVEX_URL = os.getenv("NEXT_PUBLIC_CONVEX_URL")
+CONVEX_URL = "https://capable-bee-948.convex.cloud"
 CONVEX_CLIENT = ConvexClient(CONVEX_URL)
 
 
@@ -42,20 +42,21 @@ async def sample_images_from_video(
     return {"message": "Processing video in the background"}
 
 
-def process_video(video_path: str, training_id: str, description: str, target_dir_path: Path):
+def process_video(training_id: str, description: str, target_dir_path: Path):
     # Create directory for the uploaded file's images
     # Initialize OpenCV video capture
+
+    training_job = CONVEX_CLIENT.query("trainingJobs:getTrainingJobById", dict(jobId=training_id))
+    video_id = training_job.get("videoIds", [])[0]
+    video_url = CONVEX_CLIENT.query("trainingJobs:getTrainingVideoUrl", dict(videoId=video_id))
+    video = requests.get(video_url)
+    video_path = f"{target_dir_path}/{training_id}.mp4"
+    with open(video_path, "wb") as f:
+        f.write(video.content)
+
     cap = cv2.VideoCapture(video_path)
     fps = int(cap.get(cv2.CAP_PROP_FPS))
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-
-    training_job = CONVEX_CLIENT.query("trainingJobs:getTrainingJobById", dict(jobId=training_id))
-    video_id = training_job.get("videoids", [])[0]
-    video_url = CONVEX_CLIENT.query("trainingJobs:getTrainingVideoUrl", dict(videoId=video_id))
-    video = requests.get(video_url)
-    with open(f"{target_dir_path}/{training_id}.mp4", "wb") as f:
-        f.write(video.content)
-
     # Set ontology for the model
     ontology = CaptionOntology(
         {
@@ -68,6 +69,7 @@ def process_video(video_path: str, training_id: str, description: str, target_di
     )
 
     mask_annotator = sv.MaskAnnotator()
+    box_annotator = sv.BoxAnnotator()
 
     if not os.path.exists(f"./{IMAGE_DIR_PATH}/{training_id}"):
         os.makedirs(f"./{IMAGE_DIR_PATH}/{training_id}")
@@ -103,18 +105,21 @@ def process_video(video_path: str, training_id: str, description: str, target_di
             annotated_image = mask_annotator.annotate(
                 selected_frame.copy(), detections=result
             )
+            annotated_image = box_annotator.annotate(
+                annotated_image, detections=result, labels=["suspecious item"]
+            )
             print("saving frame: ", frame_save_path)
             cv2.imwrite(frame_save_path, selected_frame)
             cv2.imwrite(annotated_frame_save_path, annotated_image)
-            status = i // image_count * 100
-            masked_image_ids = upload_image_to_convex(annotated_frame_save_path, status, masked_image_ids)
+            status = i * 100 // image_count
+            masked_image_ids = upload_image_to_convex(training_id, annotated_frame_save_path, status, masked_image_ids)
 
     CONVEX_CLIENT.mutation(
         "trainingJobs:updateTrainingJob",
         dict(
-            id=training_id,
+            _id=training_id,
             status="segmented",
-            progress=100,
+            segmentingProgress=100,
         ),
     )
     print("Done")
@@ -122,7 +127,7 @@ def process_video(video_path: str, training_id: str, description: str, target_di
 
 
 # Upload the image to Convex
-def upload_image_to_convex(image_path: str, status:int, masked_image_ids: list = []):
+def upload_image_to_convex(training_id, image_path: str, status:int, masked_image_ids: list = []):
     tempUrl = CONVEX_CLIENT.mutation("trainingJobs:generateUploadUrl")
     result = requests.post(
         tempUrl,
@@ -133,9 +138,9 @@ def upload_image_to_convex(image_path: str, status:int, masked_image_ids: list =
     CONVEX_CLIENT.mutation(
         "trainingJobs:updateTrainingJob",
         dict(
-            id=id,
+            _id=training_id,
             status="segmenting",
-            progress=status,
+            segmentingProgress=status,
             maskedImageIds=masked_image_ids,
         ),
     )
