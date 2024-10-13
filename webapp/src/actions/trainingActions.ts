@@ -1,11 +1,11 @@
 "use server";
-
 import { fetchMutation } from "convex/nextjs";
 import { api } from "../../convex/_generated/api";
 import fs from "fs";
 import path from "path";
 import { fileTypeFromBuffer } from "file-type";
 import { sleep } from "@/lib/utils";
+import { waitUntil } from "@vercel/functions";
 
 export async function startSegmenting(form: FormData) {
   const videoFile = form.get("video") as File;
@@ -13,6 +13,10 @@ export async function startSegmenting(form: FormData) {
 
   if (!videoFile || !description) {
     return { error: "Please provide a video and description" };
+  }
+
+  if (videoFile.size > 4500000) {
+    return { error: "Please provide a video file smaller than 4.5MB" };
   }
 
   try {
@@ -103,7 +107,7 @@ export async function startSegmenting(form: FormData) {
       });
     };
 
-    updateProgress();
+    waitUntil(updateProgress());
     return { success: true };
   } catch (error) {
     return { error: "Failed to upload video" };

@@ -42,7 +42,7 @@ export function SuspiciousObjectsTable() {
         const latestActivity = objects[0];
         if (
           latestActivity.status === "evaluated" &&
-          (latestActivity.aiEvaluationScore ?? 1) > 0.7 &&
+          (latestActivity.aiEvaluationScore ?? 1) >= 0.7 &&
           !latestActivity.aiNotified
         ) {
           toast.error("Alert: AI has confirmed a suspicious object.", {

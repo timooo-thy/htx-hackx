@@ -174,8 +174,11 @@ export const updateTrainingJobProgress = internalMutation({
           "jn7exkvm7vyk50eerc25fcqe6h70j692" as Id<"trainingJobs">
         )
       )
-      .collect()
-      .then((jobs) => jobs[0]);
+      .unique();
+
+    if (!job) {
+      return;
+    }
 
     await ctx.db.patch(
       "jn7exkvm7vyk50eerc25fcqe6h70j692" as Id<"trainingJobs">,
