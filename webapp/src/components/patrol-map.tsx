@@ -4,7 +4,7 @@ export function PatrolMap() {
   return (
     <GoogleMapsEmbed
       apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string}
-      height={400}
+      height={600}
       width="100%;"
       mode="search"
       q="Police Station in Singapore"

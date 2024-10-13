@@ -22,7 +22,7 @@ export function RecentActivity() {
         </CardDescription>
       </CardHeader>
       <Separator />
-      <CardContent className="h-96 overflow-y-scroll pt-4">
+      <CardContent className="overflow-y-scroll pt-4 h-[500px] 2xl:h-[700px]">
         <div className="space-y-8">
           {activities?.map((activity) => (
             <div key={activity._id} className="flex items-center">
