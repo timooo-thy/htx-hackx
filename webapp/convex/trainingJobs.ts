@@ -65,6 +65,15 @@ export const getAllTrainingJobsWithWeights = query({
   },
 });
 
+export const getTrainingVideoUrl = query({
+  args: { videoId: v.id("_storage") },
+  handler: async (ctx, { videoId }) => {
+    const videoUrl = await ctx.storage.getUrl(videoId);
+
+    return videoUrl;
+  },
+});
+
 export const getTrainingJobById = query({
   args: { jobId: v.id("trainingJobs") },
   handler: async (ctx, { jobId }) => {

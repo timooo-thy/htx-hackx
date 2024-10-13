@@ -72,13 +72,13 @@ export function MainDashboard({ userName, isAdmin }: MainDashboardProps) {
               <StatsCard data={card} key={card._id} onClick={handleTabChange} />
             ))}
           </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 ">
             <div className="lg:col-span-4">
               {activeTabOverviewData && (
                 <Overview data={activeTabOverviewData} />
               )}
             </div>
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-3 h-[600px] 2xl:h-[800px]">
               <RecentActivity />
             </div>
           </div>

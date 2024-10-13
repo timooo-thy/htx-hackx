@@ -15,6 +15,10 @@ export async function startSegmenting(form: FormData) {
     return { error: "Please provide a video and description" };
   }
 
+  if (videoFile.size > 4500000) {
+    return { error: "Please provide a video file smaller than 4.5MB" };
+  }
+
   try {
     const uploadUrl = await fetchMutation(api.trainingJobs.generateUploadUrl);
     const response = await fetch(uploadUrl, {
