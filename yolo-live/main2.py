@@ -125,7 +125,7 @@ def main():
     model = YOLO('merged.pt')
     additional_classes = ['isolated bag']
     model.model.names = YOLO('yolov8n.pt').model.names         # hacky way to include original classes
-    model.model.names.update({ 80: 'isolated bag' })
+    model.model.names.update({ 80: 'isolate bag' })
     print(model.model.names)
     # target_classes = ['backpack', 'handbag', 'suitcase', 'baseball bat', 'fork', 'knife', 'scissors', 'cell phone']
     target_classes = additional_classes
