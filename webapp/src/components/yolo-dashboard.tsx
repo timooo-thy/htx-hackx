@@ -117,7 +117,7 @@ export function YoloDashboard() {
             toast.error(response.error);
           } else {
             toast.success(
-              "Video uploaded and training job created successfully"
+              "Video uploaded and training job created successfully."
             );
             setVideoFile(null);
             clearFileInput();

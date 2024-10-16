@@ -43,14 +43,17 @@ export default function ActionsDropDown({ job }: ActionsDropDownProps) {
   const generateUploadUrl = useMutation(api.trainingJobs.generateUploadUrl);
 
   const handleTraining = async () => {
+    toast.success(`Training job: ${job.jobName} has started.`);
+
     for (let i = 0; i <= 100; i += 10) {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 1800));
       await updateTrainingJob({
         _id: job._id,
         trainingProgress: i === 100 ? 99 : i,
         status: "training",
       });
     }
+
     const trainedModelFile = "./models/isolated-bag.pt";
     const uploadUrl = await generateUploadUrl();
     const response = await fetch(uploadUrl, {

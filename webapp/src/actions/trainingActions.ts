@@ -15,7 +15,7 @@ export async function startSegmenting(form: FormData) {
     return { error: "Please provide a video and description" };
   }
 
-  if (videoFile.size > 4500000) {
+  if (videoFile.size > 9500000) {
     return { error: "Please provide a video file smaller than 4.5MB" };
   }
 
@@ -39,14 +39,14 @@ export async function startSegmenting(form: FormData) {
 
     const updateProgress = async () => {
       for (let i = 0; i <= 100; i += 10) {
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        await new Promise((resolve) => setTimeout(resolve, 1100));
         await fetchMutation(api.trainingJobs.updateTrainingJob, {
           _id: jobId,
           segmentingProgress: i === 100 ? 99 : i,
         });
       }
 
-      await sleep(2000);
+      await sleep(1000);
 
       // const directoryPath = path.join(
       //   process.cwd(),
