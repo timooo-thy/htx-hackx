@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { AlertCircle, CheckCircle, FileText } from "lucide-react";
+import { AlertCircle, CheckCircle, FileText, InfoIcon } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -128,12 +128,35 @@ export const ModelsCards = ({ trainingJobs }: ModelsPageProps) => {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>{job.jobName}</span>
-              <Badge
-                variant={job.status === "trained" ? "default" : "secondary"}
-                className={`${job.status === "deployed" && "bg-green-600 text-white"}`}
-              >
-                {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
-              </Badge>
+              <div className="grid grid-cols-2 space-x-2">
+                <Badge
+                  variant={job.status === "trained" ? "default" : "secondary"}
+                  className={`${job.status === "deployed" && "bg-green-600 text-white "} col-span-1 w-full h-8`}
+                >
+                  <p className="text-center w-full">
+                    {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
+                  </p>
+                </Badge>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant={"ghost"}
+                      className="h-8 hover:bg-transparent"
+                    >
+                      <InfoIcon className="text-gray-800" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Evaluation Results</DialogTitle>
+                      <DialogDescription>{`Evaluation for ${job.jobName}`}</DialogDescription>
+                      <p>F1 Score</p>
+                      <p>Recall</p>
+                      <p>Precision</p>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -170,7 +193,7 @@ export const ModelsCards = ({ trainingJobs }: ModelsPageProps) => {
                     deployedModel === job.jobName ||
                     job.status === "training"
                   }
-                  className={`${job.status === "deployed" && "bg-green-600 text-white"} w-full col-span-1`}
+                  className={`${job.status === "deployed" && "bg-green-600 text-white"} w-full ${job.environment !== "prod" ? "col-span-1" : "col-span-2"}`}
                 >
                   {deployedModel === job._id ? "Deployed" : "Deploy Model"}
                 </Button>
@@ -203,6 +226,7 @@ export const ModelsCards = ({ trainingJobs }: ModelsPageProps) => {
                   <Button
                     disabled={job.status === "deployed"}
                     className="col-span-1"
+                    variant={"outline"}
                   >{`Push to ${nextEnv()}`}</Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
