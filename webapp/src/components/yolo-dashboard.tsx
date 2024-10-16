@@ -219,7 +219,7 @@ export function YoloDashboard() {
             <TableRow key={job._id}>
               <TableCell>{job.jobName}</TableCell>
               <TableCell>
-                <Badge className="w-20">
+                <Badge className="w-24">
                   <p className="text-center w-full">{job.status}</p>
                 </Badge>
               </TableCell>
