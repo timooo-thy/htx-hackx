@@ -43,13 +43,10 @@ export async function startSegmenting(form: FormData) {
     formData.append("training_id", jobId);
     formData.append("description", description);
 
-    const trainingResponse = await fetch(
-      "https://api-qforensic.ngrok.app/generate-images",
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
+    const trainingResponse = await fetch(`${SEGMENT_API_URL}/generate-images`, {
+      method: "POST",
+      body: formData,
+    });
 
     if (!trainingResponse.ok) {
       return { error: "Failed to segment video" };
