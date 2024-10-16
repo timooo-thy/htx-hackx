@@ -131,7 +131,7 @@ export const ModelsCards = ({ trainingJobs }: ModelsPageProps) => {
               <div className="grid grid-cols-2 space-x-2">
                 <Badge
                   variant={job.status === "trained" ? "default" : "secondary"}
-                  className={`${job.status === "deployed" && "bg-green-600 hover:bg-green-600/80 text-white "} col-span-1 w-full h-7`}
+                  className={`${job.status === "deployed" && "bg-green-600 hover:bg-green-600/80 text-white "} col-span-1 w-20 h-6`}
                 >
                   <p className="text-center w-full">
                     {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
@@ -141,7 +141,8 @@ export const ModelsCards = ({ trainingJobs }: ModelsPageProps) => {
                   <DialogTrigger asChild>
                     <Button
                       variant={"ghost"}
-                      className="h-7 hover:bg-transparent"
+                      className={`h-6 hover:bg-transparent ${job.status === "training" && "cursor-not-allowed"}`}
+                      disabled={job.status === "training"}
                     >
                       <InfoIcon className="text-gray-800" />
                     </Button>
