@@ -107,6 +107,7 @@ export const postTrainingJob = mutation({
       jobName,
       maskedImageIds: [],
       notified: false,
+      environment: "dev",
     });
     return trainingJob;
   },
@@ -129,6 +130,14 @@ export const updateTrainingJob = mutation({
     maskedImageIds: v.optional(v.array(v.string())),
     trainedModelFile: v.optional(v.string()),
     videoIds: v.optional(v.array(v.string())),
+    environment: v.optional(
+      v.union(
+        v.literal("dev"),
+        v.literal("uat"),
+        v.literal("staging"),
+        v.literal("prod")
+      )
+    ),
   },
   handler: async (
     ctx,
@@ -140,6 +149,7 @@ export const updateTrainingJob = mutation({
       maskedImageIds,
       trainedModelFile,
       videoIds,
+      environment,
     }
   ) => {
     const updateFields = {
@@ -149,6 +159,7 @@ export const updateTrainingJob = mutation({
       maskedImageIds,
       trainedModelFile,
       videoIds,
+      environment,
     };
 
     const filteredUpdateFields = Object.fromEntries(
