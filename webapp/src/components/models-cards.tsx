@@ -131,7 +131,7 @@ export const ModelsCards = ({ trainingJobs }: ModelsPageProps) => {
               <div className="grid grid-cols-2 space-x-2">
                 <Badge
                   variant={job.status === "trained" ? "default" : "secondary"}
-                  className={`${job.status === "deployed" && "bg-green-600 text-white "} col-span-1 w-full h-8`}
+                  className={`${job.status === "deployed" && "bg-green-600 hover:bg-green-600/80 text-white "} col-span-1 w-full h-8`}
                 >
                   <p className="text-center w-full">
                     {job.status.charAt(0).toUpperCase() + job.status.slice(1)}

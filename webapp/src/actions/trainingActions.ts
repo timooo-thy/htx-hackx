@@ -1,22 +1,27 @@
 "use server";
 import { fetchMutation } from "convex/nextjs";
 import { api } from "../../convex/_generated/api";
-import fs from "fs";
-import path from "path";
-import { fileTypeFromBuffer } from "file-type";
 import { sleep } from "@/lib/utils";
 import { waitUntil } from "@vercel/functions";
+// import fs from "fs";
+// import path from "path";
+// import { fileTypeFromBuffer } from "file-type";
 
 export async function startSegmenting(form: FormData) {
   const videoFile = form.get("video") as File;
   const description = form.get("description") as string;
+  const testFile = form.get("test") as File;
 
-  if (!videoFile || !description) {
-    return { error: "Please provide a video and description" };
+  if (!videoFile || !description || !testFile) {
+    return { error: "Please provide a video, test file and description" };
   }
 
   if (videoFile.size > 9500000) {
     return { error: "Please provide a video file smaller than 4.5MB" };
+  }
+
+  if (testFile.size > 9500000) {
+    return { error: "Please provide a test file smaller than 4.5MB" };
   }
 
   try {
@@ -39,7 +44,7 @@ export async function startSegmenting(form: FormData) {
 
     const updateProgress = async () => {
       for (let i = 0; i <= 100; i += 10) {
-        await new Promise((resolve) => setTimeout(resolve, 1100));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         await fetchMutation(api.trainingJobs.updateTrainingJob, {
           _id: jobId,
           segmentingProgress: i === 100 ? 99 : i,

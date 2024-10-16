@@ -21,6 +21,7 @@ import { startSegmenting } from "@/actions/trainingActions";
 import { toast } from "sonner";
 import TrainingFormButton from "./training-form-button";
 import ActionsDropDown from "./actions-dropdown";
+import { Badge } from "./ui/badge";
 
 export function YoloDashboard() {
   const trainingJobs = useQuery(
@@ -28,10 +29,12 @@ export function YoloDashboard() {
     {}
   );
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [testFile, setTestFile] = useState<File | null>(null);
   const [description, setDescription] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const videoFileRef = useRef<HTMLInputElement>(null);
+  const testFileRef = useRef<HTMLInputElement>(null);
   const updateTrainingJobNotification = useMutation(
     api.trainingJobs.updateTrainingJobNotification
   );
@@ -55,9 +58,17 @@ export function YoloDashboard() {
     checkNotification();
   }, [trainingJobs, updateTrainingJobNotification]);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVideoFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (event.target.files && event.target.files[0]) {
       setVideoFile(event.target.files[0]);
+    }
+  };
+
+  const handleTestFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setTestFile(event.target.files[0]);
     }
   };
 
@@ -69,6 +80,9 @@ export function YoloDashboard() {
   const clearFileInput = () => {
     if (videoFileRef.current) {
       videoFileRef.current.value = "";
+    }
+    if (testFileRef.current) {
+      testFileRef.current.value = "";
     }
   };
 
@@ -120,6 +134,7 @@ export function YoloDashboard() {
               "Video uploaded and training job created successfully."
             );
             setVideoFile(null);
+            setTestFile(null);
             clearFileInput();
             setDescription("");
           }
@@ -133,12 +148,26 @@ export function YoloDashboard() {
               type="file"
               accept="video/*"
               name="video"
-              onChange={handleFileChange}
+              onChange={handleVideoFileChange}
               ref={videoFileRef}
             />
             <p className="text-sm text-muted-foreground">
-              Upload videos to train the YOLOv8 model for suspicious behavior
+              Upload videos to train the YOLO v11 model for suspicious behavior
               detection.
+            </p>
+          </div>
+          <div className="grid w-full max-w-sm items-center gap-1.5">
+            <Label htmlFor="video-upload">Upload Test Dataset</Label>
+            <Input
+              id="test-upload"
+              type="file"
+              accept=".zip"
+              name="test"
+              onChange={handleTestFileChange}
+              ref={testFileRef}
+            />
+            <p className="text-sm text-muted-foreground">
+              Upload a zip file containing test images to evaluate the model.
             </p>
           </div>
           <div className="grid w-full max-w-sm items-center gap-1.5">
@@ -150,12 +179,11 @@ export function YoloDashboard() {
               value={description}
             />
             <p className="text-sm text-muted-foreground">
-              Enter the object description to mask and train the YOLOv8 model
-              for suspicious object detection.
+              Enter the object description to mask and train the YOLO v11 model.
             </p>
           </div>
         </div>
-        <TrainingFormButton fileSelected={!!videoFile} />
+        <TrainingFormButton fileSelected={!!videoFile && !!testFile} />
       </form>
 
       <div className="flex flex-col gap-y-5 items-start md:flex-row md:justify-between">
@@ -179,6 +207,7 @@ export function YoloDashboard() {
           <TableRow>
             <TableHead>Job Name</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Environment</TableHead>
             <TableHead>Segmenting Progress</TableHead>
             <TableHead>Training Progress</TableHead>
             <TableHead>Created At</TableHead>
@@ -189,7 +218,16 @@ export function YoloDashboard() {
           {filteredJobs.map((job) => (
             <TableRow key={job._id}>
               <TableCell>{job.jobName}</TableCell>
-              <TableCell>{job.status}</TableCell>
+              <TableCell>
+                <Badge className="w-20">
+                  <p className="text-center w-full">{job.status}</p>
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <Badge className="bg-green-600 hover:bg-green-600/80 w-20">
+                  <p className="text-center w-full">{job.environment}</p>
+                </Badge>
+              </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
                   <Progress
