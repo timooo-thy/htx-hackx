@@ -33,7 +33,7 @@ export default function RootLayout({
             <Navbar />
             {children}
             <Footer />
-            <Toaster richColors />
+            <Toaster richColors position="top-right" />
             <SpeedInsights />
           </ConvexProvider>
         </ThemeProvider>

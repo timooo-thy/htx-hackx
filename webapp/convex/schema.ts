@@ -56,6 +56,12 @@ export default defineSchema({
       v.literal("trained"),
       v.literal("deployed")
     ),
+    environment: v.union(
+      v.literal("dev"),
+      v.literal("uat"),
+      v.literal("staging"),
+      v.literal("prod")
+    ),
     trainingProgress: v.number(),
     segmentingProgress: v.number(),
     videoIds: v.array(v.string()),

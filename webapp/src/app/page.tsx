@@ -88,7 +88,7 @@ export default function LandingPage() {
                 </h3>
                 <p className="text-gray-500">
                   Automated segmenting of objects from video, labelling of data,
-                  training of models and deployment
+                  training, evaluation and deployment of models
                 </p>
               </ShineBorder>
             </div>
@@ -101,6 +101,9 @@ export default function LandingPage() {
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
                   Cutting-Edge AI Integration
                 </h2>
+                <h3 className="text-2xl font-bold dark:text-background">
+                  Fully private, no vendor lock-in.
+                </h3>
                 <p className="text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   HTX Sentinel leverages state-of-the-art AI models for
                   unparalleled accuracy in object detection, image segmentation,
@@ -113,7 +116,7 @@ export default function LandingPage() {
                   color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
                 >
                   <Badge className="bg-yellow-500 w-32 flex justify-center items-center">
-                    YOLO v8
+                    YOLO v11
                   </Badge>
                   <div className="space-y-1">
                     <h3 className="font-bold dark:text-background">
@@ -129,7 +132,7 @@ export default function LandingPage() {
                   color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
                 >
                   <Badge className="bg-green-500 w-32 flex justify-center items-center">
-                    GPT-4o-mini
+                    Llama 3.2
                   </Badge>
                   <div className="space-y-1">
                     <h3 className="font-bold dark:text-background">
@@ -181,7 +184,7 @@ export default function LandingPage() {
                 AI Model Training
               </h3>
               <p className="text-gray-500">
-                Train custom YOLO v8 models using segmented images from your
+                Train custom YOLO v11 models using segmented images from your
                 department&apos;s data
               </p>
             </div>
@@ -191,7 +194,8 @@ export default function LandingPage() {
                 Model Deployment
               </h3>
               <p className="text-gray-500">
-                Easily deploy trained models across your entire police force
+                Easily deploy trained models across different environments in
+                your entire police force
               </p>
             </div>
             <div className="flex flex-col items-center space-y-4 text-center">
