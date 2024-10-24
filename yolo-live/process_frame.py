@@ -15,13 +15,13 @@ def process_frame(queue):
     )
     while True:
         dic = queue.get()
-        frame, score, class_name = dic['frame'], dic['score'], dic['class']
+        frame, score, class_name, is_id_seen_before = dic['frame'], dic['score'], dic['class'], dic['is_id_seen_before']
         client = ConvexClient(os.getenv("NEXT_PUBLIC_CONVEX_URL"))
         activity_id, storage_url = __uploadFrame(client, frame, score, class_name)
         # similar_activities_arr = client.action("activity:getSimilarActivities", {"id": activity_id })
         # for demo, set similar_activities_arr to empty array
         similar_activities_arr = []
-        response_dict = __verifyChatGPT(storage_url, class_name, azureOpenAIClient, similar_activities_arr)
+        response_dict = __verifyChatGPT(storage_url, class_name, azureOpenAIClient, similar_activities_arr, is_id_seen_before)
         print(response_dict)
         # for demo, add to DB no matter the confidence score of chatgpt
         # if response_dict['confidence_score'] > 0.5:
@@ -50,9 +50,9 @@ def __uploadFrame(client, frame, conf_score, class_name):
     activity_id = client.mutation("activity:postActivity", {
         "title": "Patrol Update",
         "officerId": 'jh7eyty2cyh4tz8kbcfqrm2v3s70kyna',    # from officer's table
-        "description": f'Detected {class_name} near Frasers Tower',
+        "description": f'Detected {class_name} near One North',
         "objectClass": class_name,
-        "location": "Tanjong Pagar",
+        "location": "One North",
         "imageId": storage_id,
         "status": "pending",
     })
@@ -63,7 +63,7 @@ def __uploadFrame(client, frame, conf_score, class_name):
 
     return activity_id, storage_url
 
-def __verifyChatGPT(storage_url, class_name, client: AzureOpenAI, similar_activities_arr):
+def __verifyChatGPT(storage_url, class_name, client: AzureOpenAI, similar_activities_arr, is_id_seen_before):
     similar_activites_messages = []
     for similar_activity in similar_activities_arr:
         similar_activites_messages.append({
@@ -80,21 +80,25 @@ def __verifyChatGPT(storage_url, class_name, client: AzureOpenAI, similar_activi
                 }
             ]
         })
+    system_message =  "Use the above images and their evaluations as reference when evaluating the following image." if similar_activities_arr else "Evaluate the following image."
+    user_message = "Judge whether the object in the image, identified as a ${class_name}, is suspicious. Take into account the object's appearance and the place where the object is located."
+    score_for_demo = 0.3 if not is_id_seen_before else 0.8
+    message_for_demo = f"Always return a score of {score_for_demo} {'because this object has been left unattended for a period of time since this is a duplicate detection of the same object' if is_id_seen_before else ''}"
     response = client.chat.completions.create(
         model="gpt4o",
         messages= similar_activites_messages + [
             {
                 "role": "system",
                 "content": [
-                    {"type": "text", "text": f"Use the above images and their evaluations as reference when evaluating the following image."},
+                    {"type": "text", "text": system_message},
                 ]
             },
             {
             "role": "user",
             "content": [
                 # {"type": "text", "text": f"Judge whether the object in the image, identified as a ${class_name}, is suspicious. Take into account the object's appearance and the place where the object is located."},
-                # for demo, set score as 0.8
-                {"type": "text", "text": f"Judge whether the object in the image, identified as a ${class_name}, is suspicious. Take into account the object's appearance and the place where the object is located. Always return a score of 0.8."},
+                # for demo, set score as 0.3 for 1st appearance, 0.8 for duplicate appearance
+                {"type": "text", "text": f"{user_message} {message_for_demo}"},
                 {
                 "type": "image_url",
                 "image_url": {
@@ -117,9 +121,9 @@ def __verifyChatGPT(storage_url, class_name, client: AzureOpenAI, similar_activi
                             # 'min': 0,
                             # 'max': 1,
                             # 'explanation': '1 is the most suspicious, 0 is not suspicious'
-                            'min': 0.8,
-                            'max': 0.8,
-                            'explanation': 'This score should always be 0.8'
+                            'min': score_for_demo,
+                            'max': score_for_demo,
+                            'explanation': f'This score should always be {score_for_demo}'
                         },
                         'confidence_score': {
                             'type': 'number',

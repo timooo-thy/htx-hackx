@@ -20,6 +20,7 @@ def main():
         save_frame_locally_process.start()
 
     model = YOLO('./yolo-weights/yolo11l.pt')
+    expected_model_fps = 8  # ~8 for yolo11l
     model.model.names.update({ 24: 'isolated bag', 28: 'isolated bag' })    # hacky way to change 'backpack' and 'suitcase' to 'isolated bag'
     print(model.model.names)
     target_classes = [24, 28]
@@ -41,17 +42,17 @@ def main():
     # remember the last frame a class was detected, and ignore duplicate detections of the same class within a certain number of frames
     # TODO: a better implementation would be mapping frame_i to track_id, and ignoring duplicate detections of the same track_id within a certain number of frames
     frame_i = 0
-    class_to_frame_i_map = dict()                       # stores the frame_i when a class is last detected
-    frame_i_to_class_map = defaultdict(lambda: [])      # inverses class_to_frame_i_map's keys and values (key: frame_i, value: arr of class_name)
-    confirmed_or_deleted_track_ids = set()              # track_ids that have been confirmed before (or deleted if not detected for max_age frames)
-    min_frames_before_duplicate_class = 60 * 30         # determines how many frames before the same class can be detected again
+    class_to_frame_i_map = dict()                                       # stores the frame_i when a class is last detected
+    frame_i_to_class_map = defaultdict(lambda: [])                      # inverses class_to_frame_i_map's keys and values (key: frame_i, value: arr of class_name)
+    confirmed_or_deleted_track_ids = set()                              # track_ids that have been confirmed before (or deleted if not detected for max_age frames)
+    min_frames_before_duplicate_class = expected_model_fps * 30         # determines how many frames before the same class can be detected again
 
     frame_count = 0
     start_time = time.time()
     fps = 0
     while True:
         # update class_to_frame_i_map and frame_i_to_class_map
-        # remove classes that were detected more than 1800 frames ago
+        # remove classes that were detected more than min_frames_before_duplicate_class frames ago
         frame_i_to_class_map_keys = list(frame_i_to_class_map.keys())
         for frame_i_key in frame_i_to_class_map_keys:
             if frame_i_key < frame_i - min_frames_before_duplicate_class:
@@ -78,17 +79,20 @@ def main():
                 current_class = model.model.names[int(box.cls[0])]
                 conf = math.ceil(box.conf[0] * 100) / 100
                 detections.append((([x1, y1, w, h], conf, current_class)))
-        tracks = tracker.update_tracks(detections, frame=frame)
         
-        # get idxs of current tracks from reid tracker that are not detected by the yolo model (code from DeepSort's update_tracks)
+        # get idxs of current tracks from reid tracker that are not detected by the yolo model by duplicating code from DeepSort's update_tracks
         if len(detections) > 0:
             assert len(detections[0][0])==4
             raw_detections = [d for d in detections if d[0][2] > 0 and d[0][3] > 0]
             embeds = tracker.generate_embeds(frame, raw_detections)
             generated_detections = tracker.create_detections(raw_detections, embeds)
             _, unmatched_track_idxs, _ = tracker.tracker._match(generated_detections)
+            tracker.tracker.predict()
+            tracker.tracker.update(generated_detections)
+            tracks = tracker.tracks
         else:
             # if no yolo detections, then all reid tracks must be unmatched 
+            tracks = tracker.update_tracks(detections, frame=frame)
             unmatched_track_idxs = [i for i in range(len(tracks))]
 
         # construct the new_tracks array and update reid tracker's tracks to that
@@ -116,16 +120,16 @@ def main():
         print('Currently detected tracks:', [track.track_id for track in detected_tracks])
         print('Just exited tracks (within past 3 frames):', [track.track_id for track in just_exited_tracks])
         print('Tracks that are remembered by reid tracker:', [track.track_id for track in new_tracks])
-        print('\n')
 
-        # upload frames to DB, for tracks that are newly confirmed, or confirmed and has not been detected for the past 1800 frames
+        # upload frames to DB, for tracks that are newly confirmed, or confirmed and has not been detected for the past min_frames_before_duplcate_class frames
         for track in detected_tracks:
             # ignore unconfirmed tracks
             if not track.is_confirmed():
                 continue
-            # if track is confirmed but class has already been detected within the last 1800 frames, ignore
+            # if track is confirmed but class has already been detected within the last min_frames_before_duplicate_class frames, ignore
             elif track.det_class in class_to_frame_i_map and frame_i - class_to_frame_i_map[track.det_class] <= min_frames_before_duplicate_class:
                 print(f'Seen the same class "{track.det_class}" within the last {min_frames_before_duplicate_class} frames, skipping')
+                class_to_frame_i_map[track.det_class] = frame_i
                 continue
             track_id = track.track_id
             ltrb = track.to_ltrb()
@@ -138,7 +142,8 @@ def main():
             cv2.rectangle(frame_copy, (x1, y1), (x2, y2), (0, 255, 0), 3)
             if process_frame_q.full():
                 process_frame_q.get()
-            process_frame_q.put({ 'frame': frame_copy, 'score': track.det_conf, 'class': track.det_class })
+            # TODO: change this when class_to_frame_i_map is changed to class_to_track_id_map
+            process_frame_q.put({ 'frame': frame_copy, 'score': track.det_conf, 'class': track.det_class, 'is_id_seen_before': track.det_class in class_to_frame_i_map})
             class_to_frame_i_map[track.det_class] = frame_i
             frame_i_to_class_map[frame_i].append(track.det_class)
 
@@ -171,6 +176,8 @@ def main():
         cv2.imshow('frame', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+        
+        print("\n")
 
 if __name__ == '__main__':
     main()
