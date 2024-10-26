@@ -114,7 +114,7 @@ export default function ActionsDropDown({ job }: ActionsDropDownProps) {
             </Button>
           </DialogTrigger>
           <DialogContent
-            className="sm:max-w-[425px]"
+            className="sm:max-w-[625px]"
             onClick={(e) => e.stopPropagation()}
           >
             <DialogHeader>
@@ -125,14 +125,14 @@ export default function ActionsDropDown({ job }: ActionsDropDownProps) {
             </DialogHeader>
             <div className="flex justify-center items-center flex-col">
               <Carousel className="w-4/5" setApi={setCarouselApi}>
-                <CarouselContent className="w-full ml-0 pl-4">
+                <CarouselContent>
                   {job.imageUrls.map((imageUrl) => (
                     <CarouselItem key={imageUrl}>
                       <Image
                         src={imageUrl ?? ""}
                         alt="Masked Image"
-                        width="250"
-                        height="200"
+                        width="800"
+                        height="500"
                         quality={100}
                       />
                     </CarouselItem>
@@ -141,7 +141,7 @@ export default function ActionsDropDown({ job }: ActionsDropDownProps) {
                 <CarouselPrevious />
                 <CarouselNext />
               </Carousel>
-              <div className="py-2 text-center text-sm text-muted-foreground">
+              <div className="py-2 text-center text-base text-muted-foreground">
                 Masked Image {current} of {job.imageUrls.length}
               </div>
             </div>

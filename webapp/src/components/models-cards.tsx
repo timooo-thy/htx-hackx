@@ -24,6 +24,16 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
+import {
+  Carousel,
+  CarouselApi,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "./ui/carousel";
+import Image from "next/image";
+import { TEST_IMAGES } from "@/lib/constants";
 
 type ModelsPageProps = {
   trainingJobs:
@@ -34,6 +44,8 @@ type ModelsPageProps = {
 export const ModelsCards = ({ trainingJobs }: ModelsPageProps) => {
   const mutateDeployModel = useMutation(api.trainingJobs.updateTrainingJob);
   const [deployedModel, setDeployedModel] = useState<string | undefined>();
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(1);
 
   useEffect(() => {
     if (trainingJobs) {
@@ -43,6 +55,18 @@ export const ModelsCards = ({ trainingJobs }: ModelsPageProps) => {
       }
     }
   }, [trainingJobs]);
+
+  useEffect(() => {
+    if (!carouselApi) {
+      return;
+    }
+
+    setCurrent(carouselApi.selectedScrollSnap() + 1);
+
+    carouselApi.on("select", () => {
+      setCurrent(carouselApi.selectedScrollSnap() + 1);
+    });
+  }, [carouselApi]);
 
   const nextEnv = () => {
     if (!trainingJobs) {
@@ -147,13 +171,36 @@ export const ModelsCards = ({ trainingJobs }: ModelsPageProps) => {
                       <InfoIcon className="text-gray-800" />
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
+                  <DialogContent className="sm:max-w-[1025px]">
                     <DialogHeader>
                       <DialogTitle>Evaluation Results</DialogTitle>
                       <DialogDescription>{`Evaluation for ${job.jobName}`}</DialogDescription>
-                      <p>F1 Score</p>
-                      <p>Recall</p>
-                      <p>Precision</p>
+                      <div className="flex justify-center items-center flex-col">
+                        <Carousel className="w-4/5" setApi={setCarouselApi}>
+                          <CarouselContent className="flex items-center">
+                            {TEST_IMAGES.map((imageUrl) => (
+                              <CarouselItem key={imageUrl}>
+                                <Image
+                                  src={imageUrl}
+                                  alt="Masked Image"
+                                  width="1000"
+                                  height="1000"
+                                  quality={100}
+                                />
+                              </CarouselItem>
+                            ))}
+                          </CarouselContent>
+                          <CarouselPrevious />
+                          <CarouselNext />
+                        </Carousel>
+                        <div className="py-2 text-center text-base text-muted-foreground">
+                          {current <= 2
+                            ? `Training Metrics: ${current} of ${TEST_IMAGES.length / 2}`
+                            : current == 3
+                              ? `Detection before training`
+                              : `Detection after training`}
+                        </div>
+                      </div>
                     </DialogHeader>
                   </DialogContent>
                 </Dialog>
