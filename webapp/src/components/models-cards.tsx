@@ -272,7 +272,9 @@ export const ModelsCards = ({ trainingJobs }: ModelsPageProps) => {
               <Dialog>
                 <DialogTrigger asChild>
                   <Button
-                    disabled={job.status === "deployed"}
+                    disabled={
+                      job.status === "deployed" || job.status === "training"
+                    }
                     className="col-span-1"
                     variant={"outline"}
                   >{`Push to ${nextEnv()}`}</Button>
