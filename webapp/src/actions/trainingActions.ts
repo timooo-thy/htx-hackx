@@ -67,7 +67,6 @@ export async function startSegmenting(form: FormData) {
       await fetchMutation(api.trainingJobs.updateTrainingJob, {
         maskedImageIds: [
           "kg20p6jq72s2c2kajp26rvwvnx71cgj6",
-          "kg20mdz1eyy8dcnq1qqqawqnt971dwj8",
           "kg2cgk4ehwkwcdqmq1j5e8f1bn71c7nn",
         ],
         _id: jobId,
